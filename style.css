@@ -1,4 +1,15 @@
 /* ============================================================
+   FONT FACE - SVN-HC Marvin Visions (tu dinh nghia)
+   ============================================================ */
+@font-face {
+    font-family: 'SVN-HC Marvin Visions';
+    src: url('fonts/SVN-HC-Marvin-Visions.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============================================================
    RETRO SÀI GÒN XƯA STYLESHEET
    ============================================================ */
 * {
