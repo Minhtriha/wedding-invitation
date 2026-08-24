@@ -1,0 +1,9 @@
+# Backup ảnh gốc độ phân giải cao — không deploy lên server
+images/originals/
+
+# Script nội bộ
+optimize_images.py
+
+# File hệ thống
+Thumbs.db
+desktop.ini

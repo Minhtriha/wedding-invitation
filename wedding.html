@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Mời Cưới — Hôn Lễ Bảo Trân & Minh Trí</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23b62b2b'/%3E%3Ctext x='50' y='68' font-size='54' text-anchor='middle' fill='%23f7e6c4' font-family='serif' font-weight='bold'%3E%E5%9B%8D%3C/text%3E%3C/svg%3E">
+    <!-- ============================================================
+         OPEN GRAPH — preview đẹp khi chia sẻ lên Facebook/Zalo/Messenger
+         👉 Sau khi deploy, thay "https://your-domain.com" bằng tên miền thật.
+         Ảnh khuyến nghị kích thước ngang 1200x630 để preview đẹp nhất.
+         ============================================================ -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Thiệp Mời Cưới Bảo Trân & Minh Trí">
+    <meta property="og:title" content="💌 Thiệp Mời Cưới — Bảo Trân & Minh Trí | 19.09.2026">
+    <meta property="og:description" content="Trân trọng kính mời bạn đến dự lễ hôn lễ của chúng tôi — 18:00, thứ Bảy, ngày 19 tháng 09 năm 2026 tại Trung Tâm Tiệc Cưới Metropole, TP. Hồ Chí Minh.">
+    <meta property="og:image" content="https://your-domain.com/images/hero.jpg">
+    <meta property="og:image:alt" content="Bảo Trân & Minh Trí — Thiệp mời cưới 19.09.2026">
+    <meta property="og:url" content="https://your-domain.com/wedding.html">
+    <meta property="og:locale" content="vi_VN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="💌 Thiệp Mời Cưới — Bảo Trân & Minh Trí | 19.09.2026">
+    <meta name="twitter:description" content="Trân trọng kính mời bạn đến dự lễ hôn lễ — 19.09.2026">
+    <meta name="twitter:image" content="https://your-domain.com/images/hero.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- HIỆU ỨNG CÁNH HOA RƠI -->
+    <div class="petal-rain" id="petalRain" aria-hidden="true"></div>
+
+    <audio id="weddingBgMusic" loop preload="auto">
+        <source id="musicSource" src="" type="audio/mpeg">
+    </audio>
+
+    <button class="music-toggle" id="musicToggleBtn" title="Bật/tắt nhạc nền">
+        <span id="musicIcon">🎵</span>
+    </button>
+
+    <!-- NÚT CHIA SẺ THIỆP -->
+    <button class="share-toggle" id="shareToggleBtn" title="Chia sẻ thiệp">
+        <span>🔗</span>
+    </button>
+
+    <!-- MÀN HÌNH MỞ PHONG BÌ -->
+    <div class="envelope-screen" id="envelopeScreen">
+        <div class="envelope-box">
+            <div class="wax-seal" id="waxSealBtn" title="Nhấp để mở thiệp">
+                <span>囍</span>
+            </div>
+            <div class="envelope-title-lockup" aria-label="Thiệp mời đám cưới">
+                <div class="envelope-headline">Thiệp Mời</div>
+                <div class="envelope-subline-row">
+                    <span class="envelope-date-badge">19.09.2026</span>
+                    <span class="envelope-script-title">Đám cưới</span>
+                </div>
+            </div>
+            <div class="envelope-couple" id="envelopeCoupleNames">Bảo Trân & Minh Trí</div>
+            <div class="envelope-guest-card">
+                <div class="envelope-guest-label"> Thân Mời</div>
+                <div class="envelope-guest-name" id="envelopeGuestName">Quý Khách & Người Thương</div>
+            </div>
+            <div>
+                <button class="btn-open-invitation" id="openInvitationBtn">✉️ Mở Thiệp Cưới</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NỘI DUNG THIỆP CHÍNH -->
+    <main class="invitation-container" id="mainInvitation">
+
+        <!-- BANNER HEADER -->
+        <header class="banner-top">
+            <div class="banner-sub">THIỆP MỜI <span class="script-tag">Đám Cưới</span></div>
+            <div class="banner-names-billboard" id="bannerCoupleBillboard">BẢO TRÂN & MINH TRÍ</div>
+            <div class="hero-illustration">
+                <img id="heroIllustrationImg" src="" alt="Cô Dâu & Chú Rể">
+            </div>
+            <div class="guest-welcome-box">
+                <div class="guest-welcome-label">Kính gửi đến:</div>
+                <div class="guest-welcome-target" id="invitationGuestTarget">Quý Khách & Người Thương</div>
+            </div>
+        </header>
+
+        <!-- ĐỒNG HỒ ĐẾM NGƯỢC -->
+        <section class="retro-paper countdown-section">
+            <div class="corner-motif cm-tl"></div>
+            <div class="corner-motif cm-tr"></div>
+            <div class="corner-motif cm-bl"></div>
+            <div class="corner-motif cm-br"></div>
+            <div class="countdown-title">⏳ Cùng Đếm Ngược Đến Ngày Trọng Đại ⏳</div>
+            <div class="countdown-grid">
+                <div class="countdown-card">
+                    <div class="countdown-num" id="cdDays">00</div>
+                    <div class="countdown-label">Ngày</div>
+                </div>
+                <div class="countdown-card">
+                    <div class="countdown-num" id="cdHours">00</div>
+                    <div class="countdown-label">Giờ</div>
+                </div>
+                <div class="countdown-card">
+                    <div class="countdown-num" id="cdMinutes">00</div>
+                    <div class="countdown-label">Phút</div>
+                </div>
+                <div class="countdown-card">
+                    <div class="countdown-num" id="cdSeconds">00</div>
+                    <div class="countdown-label">Giây</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- THÔNG TIN LỄ CƯỚI -->
+        <section class="retro-paper">
+            <div class="corner-motif cm-tl"></div>
+            <div class="corner-motif cm-tr"></div>
+            <div class="corner-motif cm-bl"></div>
+            <div class="corner-motif cm-br"></div>
+            <h2 class="retro-heading">Thông Tin Lễ Cưới</h2>
+
+            <div class="family-block">
+                <div class="family-col">
+                    <div class="family-role">Nhà Trai</div>
+                    <div class="family-parents" id="groomParents">Ông Hà Văn Tám<br>Bà Lê Thị Chín</div>
+                    <div class="family-address" id="groomAddress">Quận 3, TP. Hồ Chí Minh</div>
+                </div>
+                <div class="family-col">
+                    <div class="family-role">Nhà Gái</div>
+                    <div class="family-parents" id="brideParents">Ông Nguyễn Văn Ba<br>Bà Trần Thị Tư</div>
+                    <div class="family-address" id="brideAddress">Quận 1, TP. Hồ Chí Minh</div>
+                </div>
+            </div>
+
+            <div class="ceremony-intro">Trân trọng báo tin</div>
+            <div class="ceremony-title">Tân Hôn Của Con Chúng Tôi</div>
+
+            <div class="ceremony-couple-script">
+                <span class="couple-name-script" id="groomFullName">Hà Minh Trí</span>
+                <span class="couple-role-tag" id="groomTitle">Ái Nam</span>
+                <span class="script-ampersand">&</span>
+                <span class="couple-name-script" id="brideFullName">Nguyễn Bảo Trân</span>
+                <span class="couple-role-tag" id="brideTitle">Ái Nữ</span>
+            </div>
+
+            <div class="date-display-box">
+                <div class="date-location-label" id="ceremonyLocationLabel">Hôn lễ được cử hành tại tư gia vào lúc</div>
+                <div class="time-highlight" id="ceremonyTime">09:00</div>
+                <div class="date-columns-retro">
+                    <span id="ceremonyDayOfWeek">Thứ Bảy</span>
+                    <span class="day-number" id="ceremonyDay">19</span>
+                    <span id="ceremonyMonth">Tháng 09</span>
+                </div>
+                <div class="time-highlight" style="font-size: 1.2rem;" id="ceremonyYear">2026</div>
+                <div class="lunar-date" id="ceremonyLunarDate">(Tức ngày 09 tháng 08 năm Bính Ngọ)</div>
+            </div>
+        </section>
+
+        <!-- ALBUM ẢNH CƯỚI -->
+        <section class="retro-paper">
+            <div class="corner-motif cm-tl"></div>
+            <div class="corner-motif cm-tr"></div>
+            <div class="corner-motif cm-bl"></div>
+            <div class="corner-motif cm-br"></div>
+            <h2 class="retro-heading">Album Ảnh Cưới</h2>
+            <div class="gallery-2x2" id="photoGalleryGrid"></div>
+        </section>
+
+        <!-- THÔNG TIN TIỆC CƯỚI & LỊCH -->
+        <section class="retro-paper">
+            <div class="corner-motif cm-tl"></div>
+            <div class="corner-motif cm-tr"></div>
+            <div class="corner-motif cm-bl"></div>
+            <div class="corner-motif cm-br"></div>
+            <h2 class="retro-heading">Thông Tin Tiệc Cưới</h2>
+            <div class="ceremony-intro">Tiệc cưới sẽ diễn ra vào lúc:</div>
+            <div class="time-highlight" style="margin-top: 6px;" id="receptionTime">18:00</div>
+            <div class="date-columns-retro" style="max-width: 320px; margin: 8px auto;">
+                <span id="receptionDayOfWeek">Thứ Bảy</span>
+                <span class="day-number" id="receptionDay">19</span>
+                <span id="receptionMonth">Tháng 09</span>
+            </div>
+            <div class="time-highlight" style="font-size: 1.2rem;" id="receptionYear">2026</div>
+            <div class="lunar-date" id="receptionLunarDate">(Tức ngày 09 tháng 08 năm Bính Ngọ)</div>
+
+            <div class="calendar-widget">
+                <div class="calendar-header" id="calendarMonthHeader">Tháng 9 / 2026</div>
+                <table class="calendar-table">
+                    <thead>
+                        <tr>
+                            <th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>CN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="empty"></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
+                        </tr>
+                        <tr>
+                            <td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td>
+                        </tr>
+                        <tr>
+                            <td>14</td><td>15</td><td>16</td><td>17</td><td>18</td>
+                            <td class="wedding-day"><span>19</span></td>
+                            <td>20</td>
+                        </tr>
+                        <tr>
+                            <td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td>
+                        </tr>
+                        <tr>
+                            <td>28</td><td>29</td><td>30</td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <a id="addToCalendarBtn" href="#" target="_blank" rel="noopener" class="btn-add-cal">📅 Thêm vào Google Calendar</a>
+            </div>
+            <button class="btn-rsvp-action" onclick="openRsvpModal()">Xác Nhận Tham Dự</button>
+        </section>
+
+        <!-- ĐỊA ĐIỂM TỔ CHỨC & BẢN ĐỒ -->
+        <section class="retro-paper">
+            <div class="corner-motif cm-tl"></div>
+            <div class="corner-motif cm-tr"></div>
+            <div class="corner-motif cm-bl"></div>
+            <div class="corner-motif cm-br"></div>
+            <h2 class="retro-heading">Địa Điểm Tổ Chức</h2>
+            <div class="venue-name" id="venueName">Trung Tâm Tiệc Cưới Metropole</div>
+            <div class="venue-hall" id="venueHall">Sảnh Paris - Tầng 3</div>
+            <div class="venue-address" id="venueAddress">216 Lý Chính Thắng, Phường 9, Quận 3, TP. Hồ Chí Minh</div>
+            <div class="map-embed-wrapper">
+                <iframe id="venueMapIframe" src="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <a id="venueDirectMapBtn" href="#" target="_blank" rel="noopener" class="btn-map-direct">🗺️ Mở Chỉ Đường Bằng Google Maps</a>
+        </section>
+
+        <!-- SỔ LƯU BÚT -->
+        <section class="retro-paper">
+            <div class="corner-motif cm-tl"></div>
+            <div class="corner-motif cm-tr"></div>
+            <div class="corner-motif cm-bl"></div>
+            <div class="corner-motif cm-br"></div>
+            <h2 class="retro-heading">Sổ Lưu Bút</h2>
+            <form class="guestbook-box" id="guestbookForm">
+                <input type="text" class="gb-input" id="guestWishName" placeholder="Nhập tên của bạn*" required>
+                <textarea class="gb-textarea" id="guestWishContent" placeholder="Nhập lời chúc của bạn gửi tới cô dâu & chú rể*" required></textarea>
+                <button type="submit" class="btn-send-wish">Gửi Lời Chúc</button>
+            </form>
+            <div class="wishes-container" id="wishesList"></div>
+        </section>
+
+        <!-- HỘP QUÀ MỪNG -->
+        <section class="retro-paper">
+            <div class="corner-motif cm-tl"></div>
+            <div class="corner-motif cm-tr"></div>
+            <div class="corner-motif cm-bl"></div>
+            <div class="corner-motif cm-br"></div>
+            <h2 class="retro-heading">Hộp Quà Mừng</h2>
+            <div class="gift-envelopes-wrap" onclick="openGiftModal()" title="Nhấp vào để mừng cưới">
+                <div class="gift-envelope-item">
+                    <span class="gift-envelope-icon">🧧</span>
+                    <div class="gift-envelope-title" id="giftGroomShortTitle">Chú Rể<br>Minh Trí</div>
+                </div>
+                <div class="gift-envelope-item">
+                    <span class="gift-envelope-icon">🧧</span>
+                    <div class="gift-envelope-title" id="giftBrideShortTitle">Cô Dâu<br>Bảo Trân</div>
+                </div>
+            </div>
+            <div class="gift-click-hint">✨ Nhấn vào bao mừng cưới để mở thông tin chuyển khoản VietQR</div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="invitation-footer">
+            <p class="footer-thank-text" id="footerQuoteText">Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi!</p>
+            <div class="footer-brand" id="footerCopyrightText">© 2026 — Bảo Trân & Minh Trí | Made with ❤️</div>
+        </footer>
+
+    </main>
+
+    <!-- MODAL 1: HỘP QUÀ MỪNG (VIETQR) -->
+    <div class="modal-backdrop" id="giftModal">
+        <div class="modal-box">
+            <button class="modal-close-btn" onclick="closeGiftModal()">&times;</button>
+            <h3 class="retro-heading" style="margin-bottom: 10px;">Hộp Quà Mừng</h3>
+            <p style="font-size: 0.85rem; color: var(--ink-brown-soft);">Gửi tình cảm yêu thương và lời chúc phúc đến đôi tân lang tân nương</p>
+            <div class="qr-tabs">
+                <button class="qr-tab-btn active" id="tabGroomBtn" onclick="switchQrTab('groom')">Chú Rể</button>
+                <button class="qr-tab-btn" id="tabBrideBtn" onclick="switchQrTab('bride')">Cô Dâu</button>
+            </div>
+            <div class="qr-card" id="groomQrCard">
+                <img src="" alt="Mã QR Chú Rể" class="qr-img" id="groomQrImg">
+                <div class="bank-info-row"><strong>Ngân Hàng:</strong> <span id="groomBankName"></span></div>
+                <div class="bank-info-row"><strong>Chủ TK:</strong> <span id="groomAccountName"></span></div>
+                <div class="bank-info-row"><strong>Số TK:</strong> <span class="bank-acc-number" id="groomStk"></span></div>
+                <button class="btn-copy-stk" id="btnCopyGroomStk">📋 Sao Chép STK</button>
+            </div>
+            <div class="qr-card" id="brideQrCard" style="display: none;">
+                <img src="" alt="Mã QR Cô Dâu" class="qr-img" id="brideQrImg">
+                <div class="bank-info-row"><strong>Ngân Hàng:</strong> <span id="brideBankName"></span></div>
+                <div class="bank-info-row"><strong>Chủ TK:</strong> <span id="brideAccountName"></span></div>
+                <div class="bank-info-row"><strong>Số TK:</strong> <span class="bank-acc-number" id="brideStk"></span></div>
+                <button class="btn-copy-stk" id="btnCopyBrideStk">📋 Sao Chép STK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: RSVP -->
+    <div class="modal-backdrop" id="rsvpModal">
+        <div class="modal-box">
+            <button class="modal-close-btn" onclick="closeRsvpModal()">&times;</button>
+            <h3 class="retro-heading" style="margin-bottom: 10px;">Xác Nhận Tham Dự</h3>
+            <p style="font-size: 0.85rem; color: var(--ink-brown-soft); margin-bottom: 15px;" id="rsvpDeadlineText">Vui lòng phản hồi trước ngày 05.09.2026 để gia đình đón tiếp chu đáo nhất</p>
+            <form id="rsvpForm" style="text-align: left;">
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--ink-brown-faint);">Họ và tên khách mời*</label>
+                <input type="text" class="gb-input" id="rsvpGuestName" placeholder="VD: Anh Tuấn & Chị Mai" required>
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--ink-brown-faint);">Số người tham dự*</label>
+                <select class="gb-input" id="rsvpGuestCount">
+                    <option value="1">1 người (Tôi sẽ tham dự một mình)</option>
+                    <option value="2" selected>2 người (Tôi và người thương/bạn đi cùng)</option>
+                    <option value="3">3 người (Cả gia đình)</option>
+                    <option value="4">4 người trở lên</option>
+                    <option value="0">Rất tiếc tôi không thể tham dự</option>
+                </select>
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--ink-brown-faint);">Ghi chú thêm (Ăn chay, dị ứng...)</label>
+                <input type="text" class="gb-input" id="rsvpNote" placeholder="Ghi chú nếu có...">
+                <button type="submit" class="btn-rsvp-action" style="width: 100%; margin-top: 10px;">Gửi Xác Nhận Ngay</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: LIGHTBOX (có điều hướng ảnh) -->
+    <div class="modal-backdrop lightbox-backdrop" id="lightboxModal">
+        <button class="lightbox-close-btn" id="lightboxCloseBtn" title="Đóng (Esc)">&times;</button>
+        <button class="lightbox-nav-btn lightbox-prev" id="lightboxPrevBtn" title="Ảnh trước (←)">‹</button>
+        <img src="" alt="Ảnh cưới xem lớn" id="lightboxImg" class="lightbox-img-full">
+        <button class="lightbox-nav-btn lightbox-next" id="lightboxNextBtn" title="Ảnh sau (→)">›</button>
+        <div class="lightbox-counter" id="lightboxCounter"></div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast-msg" id="toastMsg"></div>
+
+    <!-- SCRIPTS -->
+    <script src="config.js"></script>
+    <script src="guests.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

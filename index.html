@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Khách Mời — Bảo Trân & Minh Trí</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23b62b2b'/%3E%3Ctext x='50' y='68' font-size='54' text-anchor='middle' fill='%23f7e6c4' font-family='serif' font-weight='bold'%3E%E5%9B%8D%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #1a0202;
+            --bg-darker: #100101;
+            --bg-grad: linear-gradient(to bottom right, #2a0404, #1a0202, #100101);
+            --card-red: #680e0e;
+            --gold: #e9ce9e;
+            --gold-bright: #FFD700;
+            --gold-soft: #c9a86a;
+            --cream: #fff8ec;
+            --ink: #3d2b1f;
+            --white: #ffffff;
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: var(--bg-grad);
+            color: var(--gold);
+            min-height: 100vh;
+            padding: 30px 15px 60px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header .couple {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            color: var(--gold-bright);
+            text-shadow: 0 3px 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .header .date {
+            font-size: 1rem;
+            letter-spacing: 4px;
+            color: var(--gold-soft);
+            margin-top: 5px;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: rgba(233, 206, 158, 0.6);
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* Card */
+        .card {
+            background: rgba(104, 14, 14, 0.3);
+            border: 1px solid rgba(233, 206, 158, 0.15);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .count {
+            background: var(--gold);
+            color: var(--card-red);
+            font-size: 0.8rem;
+            border-radius: 20px;
+            padding: 2px 12px;
+            font-weight: 700;
+        }
+
+        /* Add guest form */
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-form input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(233, 206, 158, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--gold);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+        }
+
+        .add-form input::placeholder {
+            color: rgba(233, 206, 158, 0.4);
+        }
+
+        .add-form input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .btn {
+            background: var(--gold);
+            color: var(--card-red);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out);
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(233, 206, 158, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold-soft);
+        }
+
+        .btn-outline:hover {
+            background: rgba(233, 206, 158, 0.1);
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.85rem;
+        }
+
+        .btn-copy-all {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        /* Guest list */
+        .guest-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .guest-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(233, 206, 158, 0.15);
+            border-radius: 10px;
+            padding: 12px 16px;
+            transition: border-color 0.3s;
+        }
+
+        .guest-item:hover {
+            border-color: rgba(233, 206, 158, 0.4);
+        }
+
+        .guest-item .guest-name {
+            flex: 1;
+            font-size: 1.05rem;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .guest-item .guest-link {
+            flex: 2;
+            font-size: 0.75rem;
+            color: rgba(233, 206, 158, 0.5);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: monospace;
+        }
+
+        .guest-item .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .guest-item .actions .btn {
+            padding: 5px 12px;
+            font-size: 0.8rem;
+        }
+
+        .guest-item .actions .btn-copy {
+            background: var(--gold);
+            color: var(--card-red);
+        }
+
+        .guest-item .actions .btn-open {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold-soft);
+        }
+
+        .guest-item .actions .btn-delete {
+            background: transparent;
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.4);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--gold);
+            color: var(--card-red);
+            padding: 12px 30px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: transform 0.4s var(--ease-out);
+            z-index: 1000;
+            opacity: 0;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: rgba(233, 206, 158, 0.5);
+            font-size: 1rem;
+        }
+
+        /* Instructions */
+        .instructions {
+            font-size: 0.9rem;
+            color: rgba(233, 206, 158, 0.7);
+            line-height: 1.8;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+        }
+
+        .instructions code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--gold-bright);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .add-form {
+                flex-direction: column;
+            }
+            .guest-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .guest-item .guest-link {
+                width: 100%;
+            }
+            .guest-item .actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="couple">Bảo Trân & Minh Trí</div>
+            <div class="date">19 · 09 · 2026</div>
+            <div class="subtitle">Quản Lý Khách Mời & Tạo Link Mời</div>
+        </div>
+
+        <!-- Add guest -->
+        <div class="card">
+            <div class="card-title">➕ Thêm Khách Mời</div>
+            <div class="add-form">
+                <input type="text" id="newGuestName" placeholder="Nhập tên khách mời... (VD: Gia đình anh Phát)">
+                <button class="btn" id="addGuestBtn">Thêm</button>
+            </div>
+            <button class="btn btn-outline btn-copy-all" id="copyAllBtn">📋 Copy Tất Cả Link</button>
+        </div>
+
+        <!-- Guest list -->
+        <div class="card">
+            <div class="card-title">
+                📋 Danh Sách Khách Mời
+                <span class="count" id="guestCount">0</span>
+            </div>
+            <div class="guest-list" id="guestList">
+                <div class="empty-state">Chưa có khách mời nào. Thêm khách ở trên hoặc sửa file <code>guests.js</code>.</div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card">
+            <div class="card-title">📖 Hướng Dẫn</div>
+            <div class="instructions">
+                <ol>
+                    <li><strong>Thêm khách mời:</strong> Nhập tên ở ô trên và bấm "Thêm", hoặc sửa trực tiếp file <code>guests.js</code>.</li>
+                    <li><strong>Copy link riêng:</strong> Bấm nút "Copy" bên cạnh mỗi khách để lấy link thiệp có tên riêng.</li>
+                    <li><strong>Gửi hàng loạt:</strong> Bấm "Copy Tất Cả Link" để copy toàn bộ link, dán vào Zalo/Messenger để gửi.</li>
+                    <li><strong>Xem thử:</strong> Bấm "Mở" để xem thiệp với tên khách đó.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="guests.js"></script>
+    <script>
+        // ============================================================
+        // QUẢN LÝ KHÁCH MỜI
+        // ============================================================
+        const guestListEl = document.getElementById('guestList');
+        const guestCountEl = document.getElementById('guestCount');
+        const newGuestNameEl = document.getElementById('newGuestName');
+        const addGuestBtn = document.getElementById('addGuestBtn');
+        const copyAllBtn = document.getElementById('copyAllBtn');
+        const toastEl = document.getElementById('toast');
+
+        // Lấy danh sách khách: từ localStorage (nếu có thêm mới) + từ GUESTS
+        function getGuests() {
+            const custom = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
+            const all = [...GUESTS, ...custom];
+            // Loại bỏ trùng tên
+            const seen = new Set();
+            return all.filter(g => {
+                const key = g.name.trim().toLowerCase();
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+
+        // Hiển thị toast
+        let toastTimer;
+        function showToast(msg) {
+            toastEl.textContent = msg;
+            toastEl.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2500);
+        }
+
+        // Copy text vào clipboard
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (e) {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                return true;
+            }
+        }
+
+        // Render danh sách khách
+        function renderGuests() {
+            const guests = getGuests();
+            guestCountEl.textContent = guests.length;
+
+            if (guests.length === 0) {
+                guestListEl.innerHTML = '<div class="empty-state">Chưa có khách mời nào. Thêm khách ở trên hoặc sửa file <code>guests.js</code>.</div>';
+                return;
+            }
+
+            guestListEl.innerHTML = '';
+            guests.forEach((guest, index) => {
+                const link = buildGuestLink(guest);
+                const item = document.createElement('div');
+                item.className = 'guest-item';
+                item.innerHTML = `
+                    <div class="guest-name">${escapeHtml(guest.name)}</div>
+                    <div class="guest-link" title="${link}">${link}</div>
+                    <div class="actions">
+                        <button class="btn btn-copy" data-copy="${index}">📋 Copy</button>
+                        <button class="btn btn-open" data-open="${index}">👁 Mở</button>
+                        <button class="btn btn-delete" data-delete="${index}">✕</button>
+                    </div>
+                `;
+                guestListEl.appendChild(item);
+            });
+
+            // Gắn sự kiện
+            guestListEl.querySelectorAll('[data-copy]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const guest = getGuests()[parseInt(btn.dataset.copy)];
+                    const link = buildGuestLink(guest);
+                    await copyText(link);
+                    showToast('Đã copy link cho: ' + guest.name);
+                });
+            });
+
+            guestListEl.querySelectorAll('[data-open]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const guest = getGuests()[parseInt(btn.dataset.open)];
+                    window.open(buildGuestLink(guest), '_blank');
+                });
+            });
+
+            guestListEl.querySelectorAll('[data-delete]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const guest = getGuests()[parseInt(btn.dataset.delete)];
+                    deleteGuest(guest.name);
+                });
+            });
+        }
+
+        // Xóa khách (chỉ xóa khách thêm bằng form, không xóa trong GUESTS)
+        function deleteGuest(name) {
+            const custom = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
+            const filtered = custom.filter(g => g.name !== name);
+            localStorage.setItem('weddingGuests', JSON.stringify(filtered));
+            showToast('Đã xóa: ' + name);
+            renderGuests();
+        }
+
+        // Escape HTML
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Thêm khách mới
+        addGuestBtn.addEventListener('click', () => {
+            const name = newGuestNameEl.value.trim();
+            if (!name) {
+                showToast('Vui lòng nhập tên khách mời!');
+                return;
+            }
+            const custom = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
+            custom.push({ name, greeting: '' });
+            localStorage.setItem('weddingGuests', JSON.stringify(custom));
+            newGuestNameEl.value = '';
+            showToast('Đã thêm: ' + name);
+            renderGuests();
+        });
+
+        // Enter để thêm
+        newGuestNameEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                addGuestBtn.click();
+            }
+        });
+
+        // Copy tất cả link
+        copyAllBtn.addEventListener('click', async () => {
+            const guests = getGuests();
+            if (guests.length === 0) {
+                showToast('Chưa có khách mời nào!');
+                return;
+            }
+            const text = guests.map(g => g.name + ': ' + buildGuestLink(g)).join('\n');
+            await copyText(text);
+            showToast('Đã copy ' + guests.length + ' link!');
+        });
+
+        // Khởi tạo
+        renderGuests();
+    </script>
+</body>
+</html>

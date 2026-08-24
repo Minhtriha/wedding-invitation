@@ -1,0 +1,25 @@
+# Cấu hình deploy cho Netlify
+# Website tĩnh thuần — không cần build step, chỉ publish thư mục gốc.
+
+[build]
+  publish = "."
+
+# Chuyển hướng /wedding đến wedding.html
+[[redirects]]
+  from = "/wedding"
+  to = "/wedding.html"
+  status = 301
+
+# Chuyển hướng / đến index.html
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 301
+
+# Headers bảo mật nhẹ
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
