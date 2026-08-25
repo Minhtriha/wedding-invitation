@@ -18,8 +18,8 @@ const WEDDING_CONFIG = {
         bank: {
             bankName: "Wooribank",
             accountName: "HA MINH TRI",
-            accountNumber: "0988888888",
-            qrUrl: "https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=0&addInfo=Mung%20Cuoi%20Minh%20Tri&accountName=HA%20MINH%20TRI"
+            accountNumber: "100200278555",
+            qrUrl: "https://img.vietqr.io/image/WOORIBANK-100200278555-compact2.png?amount=0&addInfo=Mung%20Cuoi%20Minh%20Tri&accountName=HA%20MINH%20TRI"
         }
     },
     bride: {
@@ -29,17 +29,17 @@ const WEDDING_CONFIG = {
         parents: "Ông: Nguyễn Minh Tú<br>Bà: Huỳnh Thị Ngọc Anh",
         address: "461 Đỗ Mười, Khu phố 48, phường Linh Xuân, TP. Hồ Chí Minh",
         bank: {
-            bankName: "Vietcombank",
+            bankName: "Wooribank",
             accountName: "Huynh Ngoc Bao TRAN",
-            accountNumber: "0123456789",
-            qrUrl: "https://img.vietqr.io/image/VCB-0123456789-compact2.png?amount=0&addInfo=Mung%20Cuoi%20Bao%20Tran&accountName=NGUYEN%20BAO%20TRAN"
+            accountNumber: "100200526787",
+            qrUrl: "https://img.vietqr.io/image/WOORIBANK-100200526787-compact2.png?amount=0&addInfo=Mung%20Cuoi%20Bao%20Tran&accountName=HUYNH%20NGOC%20BAO%20TRAN"
         }
     },
 
     // ---------------------------------------------------------------------
     // 2. THỜI GIAN & ĐỊA ĐIỂM (DATE, TIME & VENUE)
     // ---------------------------------------------------------------------
-    // Ngày giờ đám cưới (dùng cho đồng hồ đếm ngược - định dạng: YYYY-MM-DDTHH:mm:ss)
+    // Ngnày giờ đám cưới (dùng cho đồng hồ đếm ngược - định dạng: YYYY-MM-DDTHH:mm:ss)
     weddingDateTime: "2026-09-19T18:00:00",
     
     // Lễ Gia Tiên (Tại tư gia)
@@ -57,8 +57,8 @@ const WEDDING_CONFIG = {
     // Tiệc Cưới (Tại Nhà Hàng / Trung Tâm Hội Nghị)
     reception: {
         time: "09:00",
-        guestTime: "17:00",     // Giờ đón khách
-        feastTime: "18:00",     // Giờ khai tiệc
+        guestTime: "00:00",     // Giờ đón khách
+        feastTime: "00:00",     // Giờ khai tiệc
         dayOfWeek: "Thứ Bảy",
         day: "19",
         month: "09",
