@@ -13,7 +13,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Thiệp Mời Cưới Bảo Trân & Minh Trí">
     <meta property="og:title" content="💌 Thiệp Mời Cưới — Bảo Trân & Minh Trí | 19.09.2026">
-    <meta property="og:description" content="Trân trọng kính mời bạn đến dự lễ hôn lễ của chúng tôi — 18:00, thứ Bảy, ngày 19 tháng 09 năm 2026 tại Trung Tâm Tiệc Cưới Metropole, TP. Hồ Chí Minh.">
+    <meta property="og:description" content="Trân trọng kính mời">
     <meta property="og:image" content="https://btranmtri-wedding.cloud/images/hero.jpg">
     <meta property="og:image:alt" content="Bảo Trân & Minh Trí — Thiệp mời cưới 19.09.2026">
     <meta property="og:url" content="https://btranmtri-wedding.cloud/wedding.html">
@@ -54,7 +54,7 @@
             <div class="envelope-title-lockup" aria-label="Thiệp mời đám cưới">
                 <div class="envelope-headline">Thiệp Mời</div>
                 <div class="envelope-subline-row">
-                    <span class="envelope-date-badge">19.09.2026</span>
+                    <span class="envelope-date-badge" id="envelopeDateBadge">19.09.2026</span>
                     <span class="envelope-script-title">Đám cưới</span>
                 </div>
             </div>
@@ -268,7 +268,7 @@
                     <div class="gift-envelope-title" id="giftBrideShortTitle">Cô Dâu<br>Bảo Trân</div>
                 </div>
             </div>
-            <div class="gift-click-hint">✨ Nhấn vào bao mừng cưới để mở thông tin chuyển khoản VietQR</div>
+            <div class="gift-click-hint">✨ Trao gửi yêu thương</div>
         </section>
 
         <!-- FOOTER -->
@@ -285,11 +285,12 @@
             <button class="modal-close-btn" onclick="closeGiftModal()">&times;</button>
             <h3 class="retro-heading" style="margin-bottom: 10px;">Hộp Quà Mừng</h3>
             <p style="font-size: 0.85rem; color: var(--ink-brown-soft);">Gửi tình cảm yêu thương và lời chúc phúc đến đôi tân lang tân nương</p>
-            <div class="qr-tabs">
-                <button class="qr-tab-btn active" id="tabGroomBtn" onclick="switchQrTab('groom')">Chú Rể</button>
-                <button class="qr-tab-btn" id="tabBrideBtn" onclick="switchQrTab('bride')">Cô Dâu</button>
-            </div>
-            <div class="qr-card" id="groomQrCard">
+            <div id="qrArea">
+                <div class="qr-tabs">
+                    <button class="qr-tab-btn active" id="tabGroomBtn" onclick="switchQrTab('groom')">Chú Rể</button>
+                    <button class="qr-tab-btn" id="tabBrideBtn" onclick="switchQrTab('bride')">Cô Dâu</button>
+                </div>
+                <div class="qr-card" id="groomQrCard">
                 <img src="" alt="Mã QR Chú Rể" class="qr-img" id="groomQrImg">
                 <div class="bank-info-row"><strong>Ngân Hàng:</strong> <span id="groomBankName"></span></div>
                 <div class="bank-info-row"><strong>Chủ TK:</strong> <span id="groomAccountName"></span></div>
@@ -303,6 +304,8 @@
                 <div class="bank-info-row"><strong>Số TK:</strong> <span class="bank-acc-number" id="brideStk"></span></div>
                 <button class="btn-copy-stk" id="btnCopyBrideStk">📋 Sao Chép STK</button>
             </div>
+            </div><!-- /qrArea -->
+            <p id="giftNoQrNote" style="display: none; font-size: 0.9rem; color: var(--ink-brown-soft); text-align: center; padding: 12px 0;">Gia đình rất mong gặp bạn tại tiệc. 💐</p>
         </div>
     </div>
 

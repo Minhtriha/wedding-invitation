@@ -16,10 +16,11 @@ const WEDDING_CONFIG = {
         parents: "Ông: Hà Văn Sơn<br>Bà: Nguyễn Thị Mỹ",
         address: "ấp Long Thạnh A, xã Long Khánh, tỉnh Đồng Tháp",
         bank: {
-            bankName: "Wooribank",
+            bankName: "Wooribank (Woori Bank Việt Nam)",
             accountName: "HA MINH TRI",
             accountNumber: "100200278555",
-            qrUrl: "https://img.vietqr.io/image/WOORIBANK-100200278555-compact2.png?amount=0&addInfo=Mung%20Cuoi%20Minh%20Tri&accountName=HA%20MINH%20TRI"
+            // Mã ngân hàng đúng trên VietQR là BIN "970457" (Woori/WVN) — mã "WOORIBANK" bị lỗi invalid acqId
+            qrUrl: "https://img.vietqr.io/image/970457-100200278555-compact2.png?amount=0&addInfo=Mung%20Cuoi%20Minh%20Tri&accountName=HA%20MINH%20TRI"
         }
     },
     bride: {
@@ -29,10 +30,11 @@ const WEDDING_CONFIG = {
         parents: "Ông: Nguyễn Minh Tú<br>Bà: Huỳnh Thị Ngọc Anh",
         address: "461 Đỗ Mười, Khu phố 48, phường Linh Xuân, TP. Hồ Chí Minh",
         bank: {
-            bankName: "Wooribank",
+            bankName: "Wooribank (Woori Bank Việt Nam)",
             accountName: "Huynh Ngoc Bao TRAN",
             accountNumber: "100200526787",
-            qrUrl: "https://img.vietqr.io/image/WOORIBANK-100200526787-compact2.png?amount=0&addInfo=Mung%20Cuoi%20Bao%20Tran&accountName=HUYNH%20NGOC%20BAO%20TRAN"
+            // Mã ngân hàng đúng trên VietQR là BIN "970457"/"WVN" — mã "WOORIBANK" bị lỗi invalid acqId
+            qrUrl: "https://img.vietqr.io/image/WVN-100200526787-compact2.png?amount=0&addInfo=Mung%20Cuoi%20Bao%20Tran&accountName=HUYNH%20NGOC%20BAO%20TRAN"
         }
     },
 
@@ -69,6 +71,72 @@ const WEDDING_CONFIG = {
         address: "Ấp Long Thạnh A, xã Long Khánh, tỉnh Đồng Tháp",
         mapUrl: "https://maps.app.goo.gl/cfsRmWnVzK1obxsG6",
         mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1172.4147147814065!2d105.2984282696109!3d10.80321831667043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDQ4JzExLjYiTiAxMDXCsDE3JzU2LjciRQ!5e1!3m2!1svi!2s!4v1787499706641!5m2!1svi!2s"
+    },
+
+    // ---------------------------------------------------------------------
+    // 2.1. THIỆP THEO BÊN (NHÀ TRAI / NHÀ GÁI)
+    // Mỗi khách trong guests.js có thuộc tính side: "groom" | "bride".
+    // Khách bên nhà gái sẽ thấy ngày đãi tiệc 13.09.2026 + bản đồ nhà gái,
+    // khách bên nhà trai thấy 19.09.2026 + bản đồ nhà trai.
+    // Các mục không khai báo sẽ fallback về `reception` / `weddingDateTime` phía trên.
+    // ---------------------------------------------------------------------
+    defaultSide: "groom",
+    sides: {
+        groom: {
+            // Nhà trai — dùng lại dữ liệu reception mặc định, chỉ ghi đè những gì khác
+            weddingDateTime: "2026-09-19T18:00:00",
+            // Lễ Gia Tiên bên nhà trai: 19.09.2026 tại tư gia nhà trai
+            ceremony: {
+                time: "09:00",
+                dayOfWeek: "Thứ Bảy",
+                day: "19",
+                month: "09",
+                year: "2026",
+                lunarDate: "Tức ngày 09 tháng 08 năm Bính Ngọ",
+                locationLabel: "Hôn lễ được cử hành tại tư gia vào lúc",
+                venueName: "Tư Gia Nhà Trai",
+                address: "ấp Long Thạnh A, xã Long Khánh, tỉnh Đồng Tháp"
+            }
+        },
+        bride: {
+            // Nhà gái — đãi tiệc sớm hơn: 13.09.2026
+            weddingDateTime: "2026-09-13T18:00:00",
+            // Lễ Gia Tiên bên nhà gái: 13.09.2026 tại tư gia nhà gái
+            ceremony: {
+                time: "11:30",
+                dayOfWeek: "Chủ Nhật",
+                day: "13",
+                month: "09",
+                year: "2026",
+                lunarDate: "Tức ngày 03 tháng 08 năm Bính Ngọ",
+                locationLabel: "Hôn lễ được cử hành tại tư gia nhà gái vào lúc",
+                venueName: "Tư Gia Nhà Gái",
+                address: "461 Đỗ Mười, Khu phố 48, phường Linh Xuân, TP. Hồ Chí Minh"
+            },
+            reception: {
+                time: "11:30",
+                dayOfWeek: "Chủ Nhật",
+                day: "13",
+                month: "09",
+                year: "2026",
+                lunarDate: "Tức ngày 03 tháng 08 năm Bính Ngọ",
+                venueName: "Tư Gia Nhà Gái",
+                hall: "",
+                address: "461 Đỗ Mười, Khu phố 48, phường Linh Xuân, TP. Hồ Chí Minh",
+                mapUrl: "https://maps.app.goo.gl/CgHB84HdCf9Tv2Uq8",
+                mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4688.542558695874!2d106.75967307573673!3d10.87445925737637!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d878f39655f5%3A0xc8efa8b1f51af9c6!2zNDYxIFFMMUEsIExpbmggWHXDom4sIEjhu5MgQ2jDrSBNaW5oIDAwNzAwLCBWaeG7h3QgTmFt!5e1!3m2!1svi!2s!4v1787673039419!5m2!1svi!2s"
+            }
+        }
+    },
+
+    // ---------------------------------------------------------------------
+    // 2.2. HỘP QUÀ MỪNG (QR CHUYỂN KHOẢN)
+    // showQrDefault: bật/tắt QR + STK mặc định cho tất cả khách.
+    // Có thể tắt riêng cho từng khách qua `showBankQr: false` trong guests.js
+    // ---------------------------------------------------------------------
+    gift: {
+        showQrDefault: true,
+        noQrMessage: "Gia đình rất mong gặp bạn tại tiệc. 💐"
     },
 
     // ---------------------------------------------------------------------

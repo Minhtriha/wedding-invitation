@@ -592,6 +592,14 @@ body {
     padding: 14px 10px;
 }
 
+/* Thiệp bên NHÁ GÁI: đổi vị trí card Nhà Trai / Nhà Gái (Nhà Gái sang trái) */
+body[data-side="bride"] .family-block {
+    direction: rtl;
+}
+body[data-side="bride"] .family-block .family-col {
+    direction: ltr;
+}
+
 .family-role {
     font-size: 0.8rem;
     font-weight: 700;

@@ -6,9 +6,12 @@
 //   - name: Tên hiển thị trên thiệp (bắt buộc)
 //   - slug: Mã ngắn cho link (tùy chọn, để trống = tự tạo từ name)
 //   - greeting: Lời mời riêng (tùy chọn, để trống = dùng mặc định)
+//   - side: "groom" (nhà trai) | "bride" (nhà gái) — quyết định ngày đãi tiệc
+//           và địa điểm hiển thị trên thiệp (mặc định: nhà trai)
+//   - showBankQr: true/false — ẩn/hiện QR + STK mừng cưới cho khách này
 //
 // Ví dụ:
-//   { name: "Gia đình anh Phát", slug: "anh-phat" }
+//   { name: "Gia đình anh Phát", slug: "anh-phat", side: "bride", showBankQr: false }
 //   Link sẽ là: wedding.html?to=anh-phat
 // ============================================================
 
@@ -62,6 +65,67 @@ function getGuestSlug(guest) {
     return (guest.slug && guest.slug.trim()) ? guest.slug.trim() : slugify(guest.name);
 }
 
+// Lấy bên thiệp của khách: "groom" (nhà trai) hoặc "bride" (nhà gái)
+function getGuestSide(guest) {
+    const def = (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.defaultSide) || 'groom';
+    if (!guest) return def;
+    // Ưu tiên cài đặt ghi đè từ trang quản lý (lưu theo slug trong localStorage)
+    const stored = (typeof getStoredGuestSettings === 'function')
+        ? getStoredGuestSettings()[getGuestSlug(guest)] : null;
+    const side = ((stored && stored.side) || guest.side || '').toLowerCase();
+    return (side === 'bride' || side === 'groom') ? side : def;
+}
+
+// Khách này có được hiện QR + STK mừng cưới không?
+// Ưu tiên: cài đặt trang quản lý > guest.showBankQr > WEDDING_CONFIG.gift.showQrDefault > true
+function getGuestShowBankQr(guest) {
+    const globalDefault = (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.gift?.showQrDefault !== undefined)
+        ? !!WEDDING_CONFIG.gift.showQrDefault : true;
+    const stored = (guest && typeof getStoredGuestSettings === 'function')
+        ? getStoredGuestSettings()[getGuestSlug(guest)] : null;
+    if (stored && stored.showBankQr !== undefined) return !!stored.showBankQr;
+    if (!guest || guest.showBankQr === undefined || guest.showBankQr === null) return globalDefault;
+    return !!guest.showBankQr;
+}
+
+// Đọc cài đặt ghi đè theo từng khách (lưu từ trang quản lý, khóa theo slug)
+function getStoredGuestSettings() {
+    try {
+        return JSON.parse(localStorage.getItem('weddingGuestSettings') || '{}') || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+// Ghi cài đặt cho một khách (side / showBankQr)
+function saveGuestSetting(slug, settings) {
+    const all = getStoredGuestSettings();
+    all[slug] = Object.assign({}, all[slug] || {}, settings);
+    localStorage.setItem('weddingGuestSettings', JSON.stringify(all));
+}
+
+// Trả về object khách đã trộn cài đặt ghi đè từ trang quản lý
+function applyGuestSettingsOverride(guest) {
+    if (!guest) return guest;
+    const o = getStoredGuestSettings()[getGuestSlug(guest)];
+    return o ? Object.assign({}, guest, o) : guest;
+}
+
+// Tìm object khách đầy đủ đang xem thiệp (theo tham số ?to= trên URL)
+function findCurrentGuest() {
+    const raw = new URLSearchParams(window.location.search).get('to') || '';
+    if (!raw) return null;
+    const decoded = decodeURIComponent(raw).trim().toLowerCase();
+    let found = null;
+    if (typeof getAllGuests === 'function') {
+        found = getAllGuests().find(g => getGuestSlug(g) === decoded) || null;
+    }
+    if (!found && typeof GUESTS !== 'undefined' && Array.isArray(GUESTS)) {
+        found = GUESTS.find(g => g.name.toLowerCase() === decoded) || null;
+    }
+    return applyGuestSettingsOverride(found);
+}
+
 // Lấy danh sách khách: từ GUESTS + localStorage (khách thêm qua trang quản lý)
 function getAllGuests() {
     let custom = [];
@@ -86,9 +150,16 @@ function findGuestBySlug(slug) {
 }
 
 // Tạo link thiệp bằng slug ngắn
+// Cài đặt bên (s) và ẩn QR (q) được mã hóa vào link để khách mở trên
+// thiết bị khác vẫn thấy đúng (không phụ thuộc localStorage).
 function buildGuestLink(guest) {
     const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-    return base + 'wedding.html?to=' + getGuestSlug(guest);
+    let url = base + 'wedding.html?to=' + getGuestSlug(guest);
+    const side = typeof getGuestSide === 'function' ? getGuestSide(guest) : null;
+    const showQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guest) : true;
+    if (side === 'bride') url += '&s=bride';
+    if (!showQr) url += '&q=0';
+    return url;
 }
 
 // Giữ tương thích: tạo link từ tên khách

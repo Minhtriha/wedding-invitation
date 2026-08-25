@@ -85,8 +85,26 @@ wedding.html?to=Gia+đình+anh+Phát
 - ✅ RSVP xác nhận tham dự
 - ✅ Guestbook lời chúc
 - ✅ Hộp quà mừng với mã VietQR (chú rể / cô dâu)
+- ✅ **2 loại thiệp theo bên** — nhà trai (19.09.2026) / nhà gái (13.09.2026): ngày đãi tiệc, địa điểm, bản đồ và vị trí card thông tin tự đổi theo khách
+- ✅ **Tùy chọn ẩn QR/STK mừng cưới** cho từng khách (`showBankQr: false`)
 - ✅ Responsive trên mọi thiết bị
 - ✅ Trang quản lý khách mời với nút copy link
+
+## 👰🤵 Thiệp theo bên (nhà trai / nhà gái) & ẩn QR
+
+Trong `guests.js`, mỗi khách có thể thêm 2 trường tùy chọn:
+
+```js
+{ name: "Gia đình chị Hà", slug: "chi-ha", side: "bride", showBankQr: false }
+```
+
+- `side`: `"groom"` (nhà trai — mặc định) hoặc `"bride"` (nhà gái). Khách bên nhà gái sẽ thấy:
+  - Ngày đãi tiệc **13.09.2026** (nhà trai: 19.09.2026) trên phong bì, mục sự kiện và đồng hồ đếm ngược
+  - Địa điểm + bản đồ riêng của bên đó (cấu hình tại `WEDDING_CONFIG.sides.bride.reception` trong `config.js`)
+  - Card Nhà Gái được đưa lên trước card Nhà Trai
+- `showBankQr: false`: ẩn toàn bộ QR + số tài khoản trong Hộp Quà Mừng cho khách này (hiện lời nhắn thay thế). Bỏ qua = hiện bình thường.
+- Không có tham số `?to=` → thiệp hiển thị như mặc định (bên nhà trai).
+
 
 ## 🌐 Deploy lên server
 

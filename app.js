@@ -1,5 +1,140 @@
 const cfg = typeof WEDDING_CONFIG !== 'undefined' ? WEDDING_CONFIG : {};
 
+// ============================================================
+// THIỆP THEO BÊN (NHÀ TRAI "groom" / NHÀ GÁI "bride")
+// Bên của khách được xác định qua `side` trong guests.js (?to=slug).
+// Không có khách => dùng defaultSide (nhà trai), hành vi như cũ.
+// ============================================================
+let currentSide = null;          // "groom" | "bride"
+let currentShowBankQr = true;    // có hiển thị QR/STK mừng cưới cho khách này không
+
+// Cấu hình theo bên (fallback rỗng nếu không khai báo)
+function getSideConfig(side) {
+    return (cfg.sides && cfg.sides[side]) || {};
+}
+
+// Thông tin đãi tiệc đang áp dụng: merge reception của bên lên reception chung
+function getActiveReception() {
+    const sideCfg = getSideConfig(currentSide);
+    if (sideCfg.reception) return Object.assign({}, cfg.reception, sideCfg.reception);
+    return cfg.reception;
+}
+
+// Ngày giờ cưới đang áp dụng (cho đồng hồ đếm ngược + nút thêm lịch)
+function getActiveDateTime() {
+    const sideCfg = getSideConfig(currentSide);
+    return sideCfg.weddingDateTime || cfg.weddingDateTime;
+}
+
+// Vẽ lịch tháng với ngày đãi tiệc được tô đậm (thay cho bảng tĩnh trong HTML)
+function buildCalendarTable(year, month, weddingDay) {
+    const headerEl = document.getElementById('calendarMonthHeader');
+    if (headerEl) headerEl.textContent = `Tháng ${month} / ${year}`;
+    const tbody = document.querySelector('.calendar-table tbody');
+    if (!tbody) return;
+
+    // Tuần bắt đầu Thứ 2 (T2..CN): getDay() CN=0 -> chuyển thành cột 6
+    let startCol = new Date(year, month - 1, 1).getDay() - 1;
+    if (startCol < 0) startCol = 6;
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    let cells = [];
+    for (let i = 0; i < startCol; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+    while (cells.length % 7 !== 0) cells.push(null);
+
+    let html = '';
+    for (let r = 0; r < cells.length / 7; r++) {
+        html += '<tr>';
+        for (let cIdx = 0; cIdx < 7; cIdx++) {
+            const d = cells[r * 7 + cIdx];
+            if (d === null) html += '<td class="empty"></td>';
+            else if (d === weddingDay) html += `<td class="wedding-day"><span>${d}</span></td>`;
+            else html += `<td>${d}</td>`;
+        }
+        html += '</tr>';
+    }
+    tbody.innerHTML = html;
+}
+
+// Xác định bên của khách đang xem + ghi đè dữ liệu ngày/bản đồ/lịch
+function applySideData() {
+    let guestObj = null;
+    try { guestObj = typeof findCurrentGuest === 'function' ? findCurrentGuest() : null; } catch (e) { guestObj = null; }
+    currentSide = typeof getGuestSide === 'function' ? getGuestSide(guestObj) : 'groom';
+    currentShowBankQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guestObj) : true;
+
+    // Tham số trên link (?s=bride / &q=0) có ưu tiên cao nhất —
+    // giúp link tự chứa cài đặt, hoạt động trên mọi thiết bị
+    const urlParams = new URLSearchParams(window.location.search);
+    const sideParam = (urlParams.get('s') || '').toLowerCase();
+    if (sideParam === 'bride' || sideParam === 'groom') currentSide = sideParam;
+    const qrParam = urlParams.get('q');
+    if (qrParam !== null) currentShowBankQr = qrParam !== '0';
+
+    document.body.dataset.side = currentSide;
+
+    const rec = getActiveReception();
+    if (!rec) return;
+
+    const setTxt = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== '') el.textContent = val; };
+    setTxt('receptionTime', rec.time);
+    setTxt('receptionDayOfWeek', rec.dayOfWeek);
+    setTxt('receptionDay', rec.day);
+    if (rec.month) setTxt('receptionMonth', `Tháng ${rec.month}`);
+    setTxt('receptionYear', rec.year);
+    if (rec.lunarDate !== undefined) setTxt('receptionLunarDate', `(${rec.lunarDate || ""})`);
+    setTxt('venueName', rec.venueName);
+    setTxt('venueHall', rec.hall);
+    setTxt('venueAddress', rec.address);
+
+    const vIframe = document.getElementById('venueMapIframe');
+    if (rec.mapEmbedUrl && vIframe) vIframe.src = rec.mapEmbedUrl;
+    const vMapBtn = document.getElementById('venueDirectMapBtn');
+    if (rec.mapUrl && vMapBtn) vMapBtn.href = rec.mapUrl;
+
+    // Ghi đè thông tin LỄ GIA TIÊN theo bên (nếu có cấu hình ceremony riêng)
+    const sideCfgForCeremony = getSideConfig(currentSide);
+    const cer = sideCfgForCeremony.ceremony;
+    if (cer && cfg.ceremony) {
+        const c = Object.assign({}, cfg.ceremony, cer);
+        setTxt('ceremonyTime', c.time);
+        setTxt('ceremonyDayOfWeek', c.dayOfWeek);
+        setTxt('ceremonyDay', c.day);
+        if (c.month) setTxt('ceremonyMonth', `Tháng ${c.month}`);
+        setTxt('ceremonyYear', c.year);
+        setTxt('ceremonyLunarDate', `(${c.lunarDate || ""})`);
+        if (c.locationLabel) setTxt('ceremonyLocationLabel', c.locationLabel);
+
+        // Vẽ lại lịch tháng đánh dấu đúng ngày đãi tiệc của bên này
+        const calYear = parseInt(rec.year, 10) || new Date().getFullYear();
+        const calMonth = parseInt(rec.month, 10) || (new Date().getMonth() + 1);
+        const calDay = parseInt(rec.day, 10) || 1;
+        buildCalendarTable(calYear, calMonth, calDay);
+    }
+
+    // Ngày trên phong bì mở thiệp
+    const badge = document.getElementById('envelopeDateBadge');
+    if (badge && rec.day && rec.month && rec.year) {
+        badge.textContent = `${rec.day}.${rec.month}.${rec.year}`;
+    }
+
+    // Nút "Thêm vào lịch" — tính từ weddingDateTime của bên tương ứng
+    const addCalBtn = document.getElementById('addToCalendarBtn');
+    if (addCalBtn) {
+        const start = new Date(getActiveDateTime() || "2026-09-19T18:00:00");
+        if (!isNaN(start.getTime())) {
+            const fmtUtc = (d) => d.toISOString().replace(/[-:]/g, '').split('.')[0];
+            const end = new Date(start.getTime() + 4 * 60 * 60 * 1000); // kéo dài 4 tiếng
+            const brideShort = cfg.bride?.shortName || "Bảo Trân";
+            const groomShort = cfg.groom?.shortName || "Minh Trí";
+            const calTitle = encodeURIComponent(`Đám Cưới ${brideShort} & ${groomShort}`);
+            const calLocation = encodeURIComponent(`${rec.venueName || ''}, ${rec.address || ''}`);
+            addCalBtn.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calTitle}&dates=${fmtUtc(start)}/${fmtUtc(end)}&details=Tiệc+cưới+${calTitle}&location=${calLocation}`;
+        }
+    }
+}
+
 function initWeddingData() {
     const brideShort = cfg.bride?.shortName || "Bảo Trân";
     const groomShort = cfg.groom?.shortName || "Minh Trí";
@@ -144,13 +279,14 @@ function initWeddingData() {
 }
 
 function initCountdown() {
-    const targetDate = new Date(cfg.weddingDateTime || "2026-09-19T18:00:00").getTime();
     const cdDaysEl = document.getElementById('cdDays');
     const cdHoursEl = document.getElementById('cdHours');
     const cdMinutesEl = document.getElementById('cdMinutes');
     const cdSecondsEl = document.getElementById('cdSeconds');
 
     function update() {
+        // Đọc target mỗi lần update để phản ánh đúng bên (nhà trai/gái) của khách
+        const targetDate = new Date(getActiveDateTime() || "2026-09-19T18:00:00").getTime();
         const now = new Date().getTime();
         const distance = targetDate - now;
         if (distance <= 0) {
@@ -189,6 +325,9 @@ function resolveGuestName() {
 }
 
 function initGuestPersonalization() {
+    // Xác định bên (nhà trai/gái) + dữ liệu riêng của khách trước tiên
+    applySideData();
+
     const currentGuest = resolveGuestName();
     const envelopeGuestNameEl = document.getElementById('envelopeGuestName');
     const invitationGuestTargetEl = document.getElementById('invitationGuestTarget');
@@ -334,7 +473,17 @@ function initGiftModal() {
     const tabBrideBtn = document.getElementById('tabBrideBtn');
 
     window.openGiftModal = function () {
-        if (giftModal) giftModal.classList.add('active');
+        if (!giftModal) return;
+        // Khách có showBankQr=false => ẩn toàn bộ QR + STK, chỉ hiện lời nhắn
+        const qrArea = document.getElementById('qrArea');
+        const noQrNote = document.getElementById('giftNoQrNote');
+        const hideQr = currentShowBankQr === false;
+        if (qrArea) qrArea.style.display = hideQr ? 'none' : 'block';
+        if (noQrNote) {
+            noQrNote.style.display = hideQr ? 'block' : 'none';
+            if (hideQr && cfg.gift?.noQrMessage) noQrNote.textContent = cfg.gift.noQrMessage;
+        }
+        giftModal.classList.add('active');
     };
     window.closeGiftModal = function () {
         if (giftModal) giftModal.classList.remove('active');
@@ -567,6 +716,7 @@ function initAnalytics() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initToast();
+    applySideData();          // xác định bên (nhà trai/gái) trước để đếm ngược đúng ngày
     initWeddingData();
     initCountdown();
     initGuestPersonalization();

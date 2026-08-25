@@ -330,6 +330,15 @@
                 <input type="text" id="newGuestName" placeholder="Nhập tên khách mời... (VD: Gia đình anh Phát)">
                 <button class="btn" id="addGuestBtn">Thêm</button>
             </div>
+            <div class="add-options" style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 10px; font-size: 0.9rem;">
+                <label>Bên thiệp:
+                    <select id="newGuestSide" style="margin-left: 6px; padding: 6px 8px;">
+                        <option value="groom">🏠 Nhà Trai (19.09)</option>
+                        <option value="bride">👰 Nhà Gái (13.09)</option>
+                    </select>
+                </label>
+                <label><input type="checkbox" id="newGuestHideQr"> 🚫 Ẩn QR/STK mừng cưới</label>
+            </div>
             <button class="btn btn-outline btn-copy-all" id="copyAllBtn">📋 Copy Tất Cả Link</button>
         </div>
 
@@ -349,8 +358,9 @@
             <div class="card-title">📖 Hướng Dẫn</div>
             <div class="instructions">
                 <ol>
-                    <li><strong>Thêm khách mời:</strong> Nhập tên ở ô trên và bấm "Thêm", hoặc sửa trực tiếp file <code>guests.js</code>.</li>
-                    <li><strong>Copy link riêng:</strong> Bấm nút "Copy" bên cạnh mỗi khách để lấy link thiệp có tên riêng.</li>
+                    <li><strong>Thêm khách mời:</strong> Nhập tên ở ô trên, chọn <strong>bên thiệp</strong> (Nhà Trai 19.09 / Nhà Gái 13.09) và tùy chọn <strong>ẩn QR</strong>, rồi bấm "Thêm".</li>
+                    <li><strong>Đổi bên / ẩn QR khách có sẵn:</strong> Dùng ô chọn "🏠 Nhà Trai / 👰 Nhà Gái" và tick "🚫Ẩn QR" ngay trong danh sách — cài đặt được mã hóa thẳng vào link mời.</li>
+                    <li><strong>Copy link riêng:</strong> Bấm nút "Copy" để lấy link thiệp đã chứa đúng bên và cài đặt QR của khách đó.</li>
                     <li><strong>Gửi hàng loạt:</strong> Bấm "Copy Tất Cả Link" để copy toàn bộ link, dán vào Zalo/Messenger để gửi.</li>
                     <li><strong>Xem thử:</strong> Bấm "Mở" để xem thiệp với tên khách đó.</li>
                 </ol>
@@ -426,18 +436,47 @@
             guestListEl.innerHTML = '';
             guests.forEach((guest, index) => {
                 const link = buildGuestLink(guest);
+                const side = typeof getGuestSide === 'function' ? getGuestSide(guest) : 'groom';
+                const showQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guest) : true;
+                const slug = getGuestSlug(guest);
                 const item = document.createElement('div');
                 item.className = 'guest-item';
                 item.innerHTML = `
-                    <div class="guest-name">${escapeHtml(guest.name)}</div>
+                    <div class="guest-name">${escapeHtml(guest.name)}
+                        <span class="side-badge side-${side}" style="margin-left:8px; font-size:0.72rem; padding:2px 8px; border-radius:10px; vertical-align:middle; ${side === 'bride' ? 'background:#fde7ef; color:#b62b6b;' : 'background:#e8eefb; color:#2b4fb6;'}">${side === 'bride' ? '👰 Nhà Gái 13.09' : '🏠 Nhà Trai 19.09'}</span>
+                        <span class="qr-badge" style="margin-left:6px; font-size:0.72rem; padding:2px 8px; border-radius:10px; vertical-align:middle; ${showQr ? 'background:#e6f6ea; color:#1d7a3a;' : 'background:#fdeaea; color:#a11;'}">${showQr ? '💳 Có QR' : '🚫 Không QR'}</span>
+                    </div>
                     <div class="guest-link" title="${link}">${link}</div>
                     <div class="actions">
+                        <select data-side-sel="${index}" title="Đổi bên thiệp" style="padding:6px 6px; font-size:0.85rem;">
+                            <option value="groom" ${side === 'groom' ? 'selected' : ''}>🏠 Nhà Trai</option>
+                            <option value="bride" ${side === 'bride' ? 'selected' : ''}>👰 Nhà Gái</option>
+                        </select>
+                        <label style="font-size:0.85rem; white-space:nowrap;"><input type="checkbox" data-qr-chk="${index}" ${showQr ? '' : 'checked'}> 🚫Ẩn QR</label>
                         <button class="btn btn-copy" data-copy="${index}">📋 Copy</button>
                         <button class="btn btn-open" data-open="${index}">👁 Mở</button>
                         <button class="btn btn-delete" data-delete="${index}">✕</button>
                     </div>
                 `;
                 guestListEl.appendChild(item);
+            });
+
+            // Gắn sự kiện đổi bên / ẩn QR (lưu vào weddingGuestSettings theo slug)
+            guestListEl.querySelectorAll('[data-side-sel]').forEach(sel => {
+                sel.addEventListener('change', () => {
+                    const guest = getGuests()[parseInt(sel.dataset.sideSel)];
+                    saveGuestSetting(getGuestSlug(guest), { side: sel.value });
+                    showToast('Đã chuyển "' + guest.name + '" sang ' + (sel.value === 'bride' ? 'NHÀ GÁI (13.09)' : 'NHÀ TRAI (19.09)'));
+                    renderGuests();
+                });
+            });
+            guestListEl.querySelectorAll('[data-qr-chk]').forEach(chk => {
+                chk.addEventListener('change', () => {
+                    const guest = getGuests()[parseInt(chk.dataset.qrChk)];
+                    saveGuestSetting(getGuestSlug(guest), { showBankQr: !chk.checked });
+                    showToast(chk.checked ? 'Đã ẨN QR/STK cho: ' + guest.name : 'Đã HIỆN QR/STK cho: ' + guest.name);
+                    renderGuests();
+                });
             });
 
             // Gắn sự kiện
@@ -488,8 +527,10 @@
                 showToast('Vui lòng nhập tên khách mời!');
                 return;
             }
+            const side = document.getElementById('newGuestSide').value;
+            const showBankQr = !document.getElementById('newGuestHideQr').checked;
             const custom = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
-            custom.push({ name, greeting: '' });
+            custom.push({ name, greeting: '', side, showBankQr });
             localStorage.setItem('weddingGuests', JSON.stringify(custom));
             newGuestNameEl.value = '';
             showToast('Đã thêm: ' + name);
