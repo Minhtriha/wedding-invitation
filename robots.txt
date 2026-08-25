@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Cho phép rõ ràng các crawler quét preview link
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
+
+User-agent: zalo-server-user-agent
+Allow: /
