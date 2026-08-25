@@ -269,7 +269,8 @@ body {
 }
 
 .envelope-guest-name {
-    font-family: 'Playfair Display', 'Times New Roman', serif;
+    /* Font hệ thống an toàn — hiển thị đúng tiếng Việt trên mọi thiết bị */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     font-size: clamp(1rem, 3vw, 1.2rem);
     font-weight: 700;
     color: var(--ink-brown);
@@ -518,6 +519,8 @@ body {
 }
 
 .guest-welcome-target {
+    /* Font hệ thống an toàn — hiển thị đúng tiếng Việt trên mọi thiết bị */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     font-size: clamp(1.15rem, 3.5vw, 1.45rem);
     font-weight: 700;
     color: var(--red-retro);
