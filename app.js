@@ -310,6 +310,10 @@ function initCountdown() {
 }
 
 function resolveGuestName() {
+    // Ưu tiên 1: tên đầy đủ nhúng sẵn trong link (&n=...) — hoạt động trên mọi thiết bị
+    const n = new URLSearchParams(window.location.search).get('n');
+    if (n && n.trim()) return decodeURIComponent(n).trim();
+
     const raw = new URLSearchParams(window.location.search).get('to') || '';
     if (!raw) return null;
     const decoded = decodeURIComponent(raw).trim();

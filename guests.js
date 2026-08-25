@@ -30,6 +30,7 @@ const GUESTS = [
     { name: "Chị Ngọc", slug: "chi-ngoc" },
     { name: "Bạn Minh", slug: "ban-minh" },
     { name: "Bạn Huyền", slug: "ban-huyen" },
+    { name: "Gia đình Hiếu, Thư", slug: "gia-dinh-hieu-thu" },
     { name: "Đồng nghiệp phòng Kinh doanh", slug: "dong-nghiep" }
 ];
 
@@ -152,6 +153,8 @@ function findGuestBySlug(slug) {
 // Tạo link thiệp bằng slug ngắn
 // Cài đặt bên (s) và ẩn QR (q) được mã hóa vào link để khách mở trên
 // thiết bị khác vẫn thấy đúng (không phụ thuộc localStorage).
+// Tên đầy đủ cũng được nhúng vào link (&n=...) để điện thoại của khách
+// hiển thị đúng ngay cả khi khách chỉ tồn tại trong localStorage máy quản lý.
 function buildGuestLink(guest) {
     const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
     let url = base + 'wedding.html?to=' + getGuestSlug(guest);
@@ -159,6 +162,7 @@ function buildGuestLink(guest) {
     const showQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guest) : true;
     if (side === 'bride') url += '&s=bride';
     if (!showQr) url += '&q=0';
+    if (guest.name) url += '&n=' + encodeURIComponent(guest.name);
     return url;
 }
 
