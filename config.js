@@ -128,7 +128,7 @@ const WEDDING_CONFIG = {
     // Xem hướng dẫn chi tiết trong README.md mục "📊 Thống kê truy cập".
     // ---------------------------------------------------------------------
     analytics: {
-        gaMeasurementId: "",          // VD: "G-ABC1234567" — để trống thì tắt thống kê
+        gaMeasurementId: "G-7W6M455PYZ",          // VD: "G-ABC1234567" — để trống thì tắt thống kê
         trackVisitorInfo: true,       // Ghi IP/quốc gia/thành phố của khách xem
         geoApiUrl: "https://ipwho.is/" // API miễn phí tra cứu vị trí theo IP
     }
