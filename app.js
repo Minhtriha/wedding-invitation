@@ -472,7 +472,7 @@ function initGiftModal() {
     const tabGroomBtn = document.getElementById('tabGroomBtn');
     const tabBrideBtn = document.getElementById('tabBrideBtn');
 
-    window.openGiftModal = function () {
+    window.openGiftModal = function (side) {
         if (!giftModal) return;
         // Khách có showBankQr=false => ẩn toàn bộ QR + STK, chỉ hiện lời nhắn
         const qrArea = document.getElementById('qrArea');
@@ -484,6 +484,10 @@ function initGiftModal() {
             if (hideQr && cfg.gift?.noQrMessage) noQrNote.textContent = cfg.gift.noQrMessage;
         }
         giftModal.classList.add('active');
+        // Bấm phông bì của ai thì mở QR của người đó (nếu khách được hiện QR)
+        if (!hideQr && typeof window.switchQrTab === 'function') {
+            window.switchQrTab(side === 'bride' ? 'bride' : 'groom');
+        }
     };
     window.closeGiftModal = function () {
         if (giftModal) giftModal.classList.remove('active');
@@ -501,6 +505,15 @@ function initGiftModal() {
             if (tabGroomBtn) tabGroomBtn.classList.remove('active');
         }
     };
+
+    // Gắn click riêng cho từng phông bì: bấm phông bì ai → mở QR của người đó
+    const envelopeItems = document.querySelectorAll('.gift-envelope-item');
+    envelopeItems.forEach(item => {
+        const isBride = !!item.querySelector('#giftBrideShortTitle');
+        item.addEventListener('click', () => {
+            window.openGiftModal(isBride ? 'bride' : 'groom');
+        });
+    });
 }
 
 function initRsvpModal() {
