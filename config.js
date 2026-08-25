@@ -140,6 +140,16 @@ const WEDDING_CONFIG = {
     },
 
     // ---------------------------------------------------------------------
+    // 2.3. SỔ LƯU BÚT — GỬI LỜI CHÚC VỀ GOOGLE SHEET
+    // 👉 Hướng dẫn tạo URL trong README.md mục "📝 Xem lời chúc tập trung".
+    // Dán Web App URL của Google Apps Script vào googleSheetUrl để nhận
+    // toàn bộ lời chúc của khách về Google Sheet (để trống = chỉ lưu máy khách).
+    // ---------------------------------------------------------------------
+    guestbook: {
+        googleSheetUrl: ""
+    },
+
+    // ---------------------------------------------------------------------
     // 3. TÙY CHỌN NHẠC NỀN (AUDIO BACKGROUND MUSIC)
     // Bạn có thể dán link mp3 online hoặc đường dẫn file mp3 cục bộ (ví dụ: "music/wedding.mp3")
     // ---------------------------------------------------------------------

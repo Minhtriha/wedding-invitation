@@ -651,12 +651,32 @@ function initGuestbook() {
             if (typeof trackEvent === 'function') {
                 trackEvent('wish_send', { wish_author: name });
             }
+            // Gửi lời chúc về Google Sheet (nếu đã cấu hình googleSheetUrl)
+            sendWishToSheet(name, content, timeStr);
             renderWishes();
             showToast('✨ Đã gửi lời chúc thành công!');
         });
     }
 
     renderWishes();
+}
+
+// ============================================================
+// GỬI LỜI CHÚC VỀ GOOGLE SHEET (qua Google Apps Script Web App)
+// Cấu hình URL tại WEDDING_CONFIG.guestbook.googleSheetUrl
+// Hướng dẫn setup chi tiết trong README.md mục "📝 Xem lời chúc tập trung".
+// ============================================================
+function sendWishToSheet(name, content, timeStr) {
+    try {
+        const url = cfg.guestbook && cfg.guestbook.googleSheetUrl;
+        if (!url) return; // Chưa cấu hình — bỏ qua im lặng
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors', // Apps Script không trả CORS header — bỏ qua kiểm tra response
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ name: name, content: content, time: timeStr })
+        }).catch(() => { /* offline — lời chúc vẫn còn trong localStorage */ });
+    } catch (e) { /* Không bao giờ làm gián đoạn trải nghiệm khách */ }
 }
 
 // ============================================================

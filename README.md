@@ -159,6 +159,42 @@ Website có sẵn hệ thống ghi nhận thống kê qua **Google Analytics 4**
 >
 > ⚠️ Nếu `gaMeasurementId` để trống, toàn bộ tính năng thống kê tự tắt — website vẫn chạy bình thường, không gây lỗi.
 
+## 📝 Xem lời chúc tập trung (Google Sheet)
+
+Mặc định lời chúc trong Sổ Lưu Bút chỉ lưu trên máy của từng khách. Để nhận
+**tất cả lời chúc về một Google Sheet** của bạn, làm theo các bước sau (một lần duy nhất):
+
+1. Tạo 1 Google Sheet mới tại [sheets.new](https://sheets.new), đặt tên VD: "Lời chúc cưới"
+2. Vào menu **Extensions → Apps Script**, xóa code mẫu và dán:
+
+```javascript
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(["Thời gian", "Tên khách", "Lời chúc"]);
+  }
+  const data = JSON.parse(e.postData.contents);
+  sheet.appendRow([data.time, data.name, data.content]);
+  return ContentService.createTextOutput("OK");
+}
+```
+
+3. Bấm **Deploy → New deployment → chọn loại "Web app"**:
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+4. Bấm Deploy → copy **Web app URL** (dạng `https://script.google.com/macros/s/AKfy.../exec`)
+5. Dán URL đó vào `config.js`:
+
+```js
+guestbook: {
+    googleSheetUrl: "https://script.google.com/macros/s/XXXX/exec"
+}
+```
+
+6. Commit + push → từ đó mỗi lời chúc khách gửi sẽ tự động thành 1 dòng trong Sheet.
+
+> 💡 Lưu ý: lần deploy đầu Apps Script có thể hỏi quyền truy cập Google — bấm Allow nhé.
+
 ## 📝 Ghi chú
 
 - Guestbook & RSVP lưu trong `localStorage` của trình duyệt (mỗi khách xem sẽ thấy lời chúc của chính họ) — dữ liệu cũng được gửi lên GA4 để bạn xem tập trung
