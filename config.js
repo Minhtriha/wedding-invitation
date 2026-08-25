@@ -118,5 +118,18 @@ const WEDDING_CONFIG = {
     // ---------------------------------------------------------------------
     rsvpDeadline: "05.09.2026",
     footerQuote: "Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi!",
-    copyright: "© 2026 — Made & Designed by Groom Minh Tri/Bride Bao Tran ❤️"
+    copyright: "© 2026 — Made & Designed by Groom Minh Tri/Bride Bao Tran ❤️",
+
+    // ---------------------------------------------------------------------
+    // 6. THỐNG KÊ TRUY CẬP (GOOGLE ANALYTICS 4)
+    // 👉 Tạo tài khoản miễn phí tại https://analytics.google.com
+    //    → Tạo property → Data streams → Web → copy Measurement ID (dạng "G-XXXXXXXXXX")
+    //    → Dán vào gaMeasurementId bên dưới, push lên GitHub là xong.
+    // Xem hướng dẫn chi tiết trong README.md mục "📊 Thống kê truy cập".
+    // ---------------------------------------------------------------------
+    analytics: {
+        gaMeasurementId: "",          // VD: "G-ABC1234567" — để trống thì tắt thống kê
+        trackVisitorInfo: true,       // Ghi IP/quốc gia/thành phố của khách xem
+        geoApiUrl: "https://ipwho.is/" // API miễn phí tra cứu vị trí theo IP
+    }
 };

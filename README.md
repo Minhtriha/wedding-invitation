@@ -102,11 +102,50 @@ Deploy nhanh với Netlify (đã có sẵn `netlify.toml`):
 2. Kéo thả thư mục `wedding-invitation` vào trang → website live ngay
 3. Gắn tên miền riêng trong **Domain settings**
 
+## 📊 Thống kê truy cập (Google Analytics 4 + IP/Location)
+
+Website có sẵn hệ thống ghi nhận thống kê qua **Google Analytics 4** (miễn phí), cho phép xem tập trung:
+
+- **Lượt truy cập** thiệp (số người xem, thời gian, thiết bị)
+- **Lượt mở thiệp** (`open_invitation`)
+- **Lượt xác nhận tham dự — RSVP** (`rsvp_submit`, kèm tên + số người)
+- **Lượt gửi lời chúc** (`wish_send`, kèm tên người gửi)
+- **IP / quốc gia / thành phố** của khách xem (`visitor_info`, kèm tên khách từ link `?to=`)
+
+### Cách bật (chỉ mất ~5 phút):
+
+1. Truy cập [analytics.google.com](https://analytics.google.com) → đăng nhập Google account
+2. **Admin (⚙️) → Create Property** → đặt tên (VD: `Wedding Bao Tran & Minh Tri`) → Create
+3. Chọn platform **Web** → nhập `https://btranmtri-wedding.cloud` → **Create stream**
+4. Copy **Measurement ID** (dạng `G-XXXXXXXXXX`)
+5. Mở file `config.js`, dán vào:
+   ```js
+   analytics: {
+       gaMeasurementId: "G-XXXXXXXXXX",  // ← dán ID của bạn vào đây
+       trackVisitorInfo: true,
+       geoApiUrl: "https://ipwho.is/"
+   }
+   ```
+6. Commit & push lên GitHub → xong! Website tự động gửi dữ liệu.
+
+### Xem dữ liệu trên GA4:
+
+| Muốn xem | Vào mục |
+|---|---|
+| Tổng lượt truy cập theo ngày | **Reports → Engagement → Overview** |
+| Ai mở thiệp | **Reports → Engagement → Events** → chọn `open_invitation` |
+| RSVP + lời chúc | **Events** → `rsvp_submit` / `wish_send` |
+| IP / quốc gia / thành phố | **DebugView** hoặc **Events** → `visitor_info` |
+
+> 💡 **Mẹo:** Để thấy được giá trị `guest_name`, `visitor_city`... trong báo cáo, vào **Admin → Custom definitions → Create custom dimension** và tạo dimension tương ứng với từng tham số sự kiện.
+>
+> ⚠️ Nếu `gaMeasurementId` để trống, toàn bộ tính năng thống kê tự tắt — website vẫn chạy bình thường, không gây lỗi.
+
 ## 📝 Ghi chú
 
-- Guestbook & RSVP lưu trong `localStorage` của trình duyệt (mỗi khách xem sẽ thấy lời chúc của chính họ) — nếu cần lưu tập trung, hãy thay bằng Google Form hoặc backend
+- Guestbook & RSVP lưu trong `localStorage` của trình duyệt (mỗi khách xem sẽ thấy lời chúc của chính họ) — dữ liệu cũng được gửi lên GA4 để bạn xem tập trung
 - Nhạc nền dùng từ Bensound (miễn phí) — có thể thay bằng file nhạc khác trong `config.js`
-- **Open Graph tags** trong `wedding.html` đang dùng URL mẫu `https://your-domain.com` — sau khi deploy, hãy thay bằng tên miền thật để preview chia sẻ hoạt động đúng
+- Open Graph tags đã trỏ về tên miền thật `https://btranmtri-wedding.cloud` — preview chia sẻ Zalo/Messenger hoạt động khi HTTPS của GitHub Pages đã sẵn sàng (ổ khóa xanh)
 
 ---
 

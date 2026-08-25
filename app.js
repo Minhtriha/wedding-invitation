@@ -375,6 +375,10 @@ function initRsvpModal() {
             const stored = JSON.parse(localStorage.getItem('weddingRsvps') || '[]');
             stored.push(rsvpData);
             localStorage.setItem('weddingRsvps', JSON.stringify(stored));
+            // Ghi nhận lên GA4 để xem tập trung trên dashboard
+            if (typeof trackEvent === 'function') {
+                trackEvent('rsvp_submit', { rsvp_name: name, rsvp_count: count });
+            }
             closeRsvpModal();
             showToast('💌 Cảm ơn bạn đã xác nhận tham dự!');
         });
@@ -494,12 +498,71 @@ function initGuestbook() {
             saved.unshift({ name, content, time: timeStr });
             localStorage.setItem('weddingWishes', JSON.stringify(saved));
             document.getElementById('guestWishContent').value = '';
+            // Ghi nhận lên GA4 để xem tập trung trên dashboard
+            if (typeof trackEvent === 'function') {
+                trackEvent('wish_send', { wish_author: name });
+            }
             renderWishes();
             showToast('✨ Đã gửi lời chúc thành công!');
         });
     }
 
     renderWishes();
+}
+
+// ============================================================
+// ANALYTICS — Google Analytics 4 + thông tin khách truy cập
+// Xem hướng dẫn bật trong README.md mục "📊 Thống kê truy cập".
+// ============================================================
+function initAnalytics() {
+    const analytics = cfg.analytics || {};
+    const gaId = analytics.gaMeasurementId;
+
+    // Nạp gtag.js nếu đã cấu hình Measurement ID
+    if (gaId) {
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { dataLayer.push(arguments); };
+        gtag('js', new Date());
+        gtag('config', gaId);
+    }
+
+    // Helper gửi sự kiện — an toàn khi chưa cấu hình GA (không gây lỗi)
+    window.trackEvent = function (name, params) {
+        if (gaId && typeof gtag === 'function') {
+            try { gtag('event', name, params || {}); } catch (e) { /* bỏ qua */ }
+        }
+    };
+
+    // Ghi thông tin khách truy cập: IP, quốc gia, thành phố (+ tên khách từ link ?to=)
+    if (analytics.trackVisitorInfo !== false && analytics.geoApiUrl && gaId) {
+        fetch(analytics.geoApiUrl)
+            .then(r => r.json())
+            .then(data => {
+                const params = {
+                    visitor_ip: data.ip || '',
+                    visitor_country: data.country || '',
+                    visitor_city: data.city || ''
+                };
+                const guestName = new URLSearchParams(location.search).get('to');
+                if (guestName) params.guest_name = guestName;
+                trackEvent('visitor_info', params);
+            })
+            .catch(() => { /* offline hoặc API lỗi — bỏ qua im lặng */ });
+    }
+
+    // Sự kiện mở thiệp (nút chính + triện sáp)
+    ['openInvitationBtn', 'waxSealBtn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', () => trackEvent('open_invitation'));
+    });
+
+    // Sự kiện bấm nút chia sẻ
+    const shareBtn = document.getElementById('shareToggleBtn');
+    if (shareBtn) shareBtn.addEventListener('click', () => trackEvent('share_click'));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -513,4 +576,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initLightbox();
     initGuestbook();
     initShare();
+    initAnalytics();
 });
