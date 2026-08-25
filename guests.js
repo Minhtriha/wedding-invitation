@@ -69,8 +69,13 @@ function getGuestSlug(guest) {
 // Lấy bên thiệp của khách: "groom" (nhà trai) hoặc "bride" (nhà gái)
 function getGuestSide(guest) {
     const def = (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.defaultSide) || 'groom';
+    // Ưu tiên 1: token trên link rút gọn (.b / .g)
+    if (URL_SIDE) return URL_SIDE;
+    // Ưu tiên 2: tham số ?s= cũ
+    const sParam = (new URLSearchParams(window.location.search).get('s') || '').toLowerCase();
+    if (sParam === 'bride' || sParam === 'groom') return sParam;
     if (!guest) return def;
-    // Ưu tiên cài đặt ghi đè từ trang quản lý (lưu theo slug trong localStorage)
+    // Ưu tiên 3: cài đặt ghi đè từ trang quản lý (lưu theo slug trong localStorage)
     const stored = (typeof getStoredGuestSettings === 'function')
         ? getStoredGuestSettings()[getGuestSlug(guest)] : null;
     const side = ((stored && stored.side) || guest.side || '').toLowerCase();
@@ -78,8 +83,11 @@ function getGuestSide(guest) {
 }
 
 // Khách này có được hiện QR + STK mừng cưới không?
-// Ưu tiên: cài đặt trang quản lý > guest.showBankQr > WEDDING_CONFIG.gift.showQrDefault > true
+// Ưu tiên: token .x trên link > tham số ?q= > cài đặt trang quản lý > guest.showBankQr > mặc định
 function getGuestShowBankQr(guest) {
+    if (URL_HIDEQR === false) return false;
+    const qParam = new URLSearchParams(window.location.search).get('q');
+    if (qParam !== null) return qParam !== '0';
     const globalDefault = (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.gift?.showQrDefault !== undefined)
         ? !!WEDDING_CONFIG.gift.showQrDefault : true;
     const stored = (guest && typeof getStoredGuestSettings === 'function')
@@ -114,9 +122,11 @@ function applyGuestSettingsOverride(guest) {
 
 // Tìm object khách đầy đủ đang xem thiệp (theo tham số ?to= trên URL)
 function findCurrentGuest() {
-    const raw = new URLSearchParams(window.location.search).get('to') || '';
+    // Hỗ trợ link rút gọn: to=<slug>.b.x — URL_SLUG đã được tách sẵn
+    const raw = URL_SLUG !== null ? URL_SLUG
+        : decodeURIComponent(new URLSearchParams(window.location.search).get('to') || '').trim().toLowerCase();
     if (!raw) return null;
-    const decoded = decodeURIComponent(raw).trim().toLowerCase();
+    const decoded = raw;
     let found = null;
     if (typeof getAllGuests === 'function') {
         found = getAllGuests().find(g => getGuestSlug(g) === decoded) || null;
@@ -126,6 +136,27 @@ function findCurrentGuest() {
     }
     return applyGuestSettingsOverride(found);
 }
+
+// ============================================================
+// LINK RÚT GỌN: mọi tùy chọn gói trong một tham số to=
+// Định dạng: to=<slug>[.b][.x]   (.b = nhà gái, .x = ẩn QR)
+// Slug chỉ chứa a-z0-9- nên dấu chấm không bao giờ trùng.
+// Vẫn hỗ trợ tương thích tham số cũ ?s=&q=&n=
+// ============================================================
+let URL_SLUG = null, URL_SIDE = null, URL_HIDEQR = null;
+
+(function parseShortLink() {
+    const to = new URLSearchParams(window.location.search).get('to');
+    if (!to) return;
+    const parts = decodeURIComponent(to).trim().split('.');
+    URL_SLUG = parts[0].toLowerCase();
+    parts.slice(1).forEach(token => {
+        const t = token.toLowerCase();
+        if (t === 'b') URL_SIDE = 'bride';
+        if (t === 'g') URL_SIDE = 'groom';
+        if (t === 'x') URL_HIDEQR = false;
+    });
+})();
 
 // Lấy danh sách khách: từ GUESTS + REMOTE (Google Sheet) + localStorage (khách thêm qua trang quản lý)
 function getAllGuests() {
@@ -183,12 +214,17 @@ function findGuestBySlug(slug) {
 // hiển thị đúng ngay cả khi khách chỉ tồn tại trong localStorage máy quản lý.
 function buildGuestLink(guest) {
     const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+    // Link rút gọn: to=<slug>.b.x  (.b = nhà gái, .x = ẩn QR)
     let url = base + 'wedding.html?to=' + getGuestSlug(guest);
     const side = typeof getGuestSide === 'function' ? getGuestSide(guest) : null;
     const showQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guest) : true;
-    if (side === 'bride') url += '&s=bride';
-    if (!showQr) url += '&q=0';
-    if (guest.name) url += '&n=' + encodeURIComponent(guest.name);
+    if (side === 'bride') url += '.b';
+    if (!showQr) url += '.x';
+    // Nếu CHƯA cấu hình Google Sheet: nhúng thêm tên đầy đủ (&n=) để
+    // khách chỉ tồn tại trên máy quản lý vẫn hiển thị đúng ở thiết bị khác.
+    const hasSheet = (typeof WEDDING_CONFIG !== 'undefined') &&
+                     WEDDING_CONFIG.guestbook && WEDDING_CONFIG.guestbook.googleSheetUrl;
+    if (!hasSheet && guest.name) url += '&n=' + encodeURIComponent(guest.name);
     return url;
 }
 

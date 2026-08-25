@@ -71,6 +71,9 @@ function applySideData() {
     if (sideParam === 'bride' || sideParam === 'groom') currentSide = sideParam;
     const qrParam = urlParams.get('q');
     if (qrParam !== null) currentShowBankQr = qrParam !== '0';
+    // Link rút gọn to=<slug>.b.x (biến toàn cục từ guests.js)
+    if (typeof URL_SIDE !== 'undefined' && URL_SIDE) currentSide = URL_SIDE;
+    if (typeof URL_HIDEQR !== 'undefined' && URL_HIDEQR === false) currentShowBankQr = false;
 
     document.body.dataset.side = currentSide;
 
