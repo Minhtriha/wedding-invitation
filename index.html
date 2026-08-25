@@ -371,6 +371,7 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <script src="config.js"></script>
     <script src="guests.js"></script>
     <script>
         // ============================================================
@@ -383,10 +384,11 @@
         const copyAllBtn = document.getElementById('copyAllBtn');
         const toastEl = document.getElementById('toast');
 
-        // Lấy danh sách khách: từ localStorage (nếu có thêm mới) + từ GUESTS
+        // Lấy danh sách khách: GUESTS (file) + Google Sheet (remote) + localStorage
         function getGuests() {
             const custom = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
-            const all = [...GUESTS, ...custom];
+            const remote = (typeof REMOTE_GUESTS !== 'undefined' && Array.isArray(REMOTE_GUESTS)) ? REMOTE_GUESTS : [];
+            const all = [...GUESTS, ...remote, ...custom];
             // Loại bỏ trùng tên
             const seen = new Set();
             return all.filter(g => {
@@ -396,6 +398,26 @@
                 return true;
             });
         }
+
+        // Gửi dữ liệu lên Google Apps Script (nếu đã cấu hình URL)
+        function postToSheet(payload) {
+            try {
+                const url = typeof WEDDING_CONFIG !== 'undefined' &&
+                            WEDDING_CONFIG.guestbook && WEDDING_CONFIG.guestbook.googleSheetUrl;
+                if (!url) return;
+                fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                }).catch(() => {});
+            } catch (e) {}
+        }
+
+        // Khi danh sách khách trên Sheet tải xong -> vẽ lại danh sách
+        document.addEventListener('remote-guests-loaded', () => {
+            if (typeof renderGuests === 'function') renderGuests();
+        });
 
         // Hiển thị toast
         let toastTimer;
@@ -466,6 +488,7 @@
                 sel.addEventListener('change', () => {
                     const guest = getGuests()[parseInt(sel.dataset.sideSel)];
                     saveGuestSetting(getGuestSlug(guest), { side: sel.value });
+                    postToSheet({ action: 'setGuest', name: guest.name, side: sel.value });
                     showToast('Đã chuyển "' + guest.name + '" sang ' + (sel.value === 'bride' ? 'NHÀ GÁI (13.09)' : 'NHÀ TRAI (19.09)'));
                     renderGuests();
                 });
@@ -474,6 +497,7 @@
                 chk.addEventListener('change', () => {
                     const guest = getGuests()[parseInt(chk.dataset.qrChk)];
                     saveGuestSetting(getGuestSlug(guest), { showBankQr: !chk.checked });
+                    postToSheet({ action: 'setGuest', name: guest.name, showBankQr: !chk.checked });
                     showToast(chk.checked ? 'Đã ẨN QR/STK cho: ' + guest.name : 'Đã HIỆN QR/STK cho: ' + guest.name);
                     renderGuests();
                 });
@@ -509,6 +533,8 @@
             const custom = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
             const filtered = custom.filter(g => g.name !== name);
             localStorage.setItem('weddingGuests', JSON.stringify(filtered));
+            // Xóa cả trên Google Sheet (nếu có)
+            postToSheet({ action: 'deleteGuest', name: name });
             showToast('Đã xóa: ' + name);
             renderGuests();
         }
@@ -532,6 +558,8 @@
             const custom = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
             custom.push({ name, greeting: '', side, showBankQr });
             localStorage.setItem('weddingGuests', JSON.stringify(custom));
+            // Đồng bộ khách mới lên Google Sheet để mọi thiết bị nhận được
+            postToSheet({ action: 'addGuest', name: name, side: side, showBankQr: showBankQr });
             newGuestNameEl.value = '';
             showToast('Đã thêm: ' + name);
             renderGuests();

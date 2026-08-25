@@ -127,7 +127,7 @@ function findCurrentGuest() {
     return applyGuestSettingsOverride(found);
 }
 
-// Lấy danh sách khách: từ GUESTS + localStorage (khách thêm qua trang quản lý)
+// Lấy danh sách khách: từ GUESTS + REMOTE (Google Sheet) + localStorage (khách thêm qua trang quản lý)
 function getAllGuests() {
     let custom = [];
     try {
@@ -136,13 +136,39 @@ function getAllGuests() {
         custom = [];
     }
     const seen = new Set();
-    return [...GUESTS, ...custom].filter(g => {
+    return [...GUESTS, ...(REMOTE_GUESTS || []), ...custom].filter(g => {
         const key = g.name.trim().toLowerCase();
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
     });
 }
+
+// ============================================================
+// DANH SÁCH KHÁCH TỪ GOOGLE SHEET (tùy chọn)
+// Dùng chung URL Apps Script với lời chúc: WEDDING_CONFIG.guestbook.googleSheetUrl
+// Khách thêm từ trang quản lý (kể cả trên điện thoại) sẽ lưu lên Sheet,
+// thiệp ở mọi thiết bị tự tải về và hiển thị đúng tên.
+// ============================================================
+let REMOTE_GUESTS = null;
+
+function loadRemoteGuests() {
+    try {
+        const url = (typeof WEDDING_CONFIG !== 'undefined') &&
+                    WEDDING_CONFIG.guestbook && WEDDING_CONFIG.guestbook.googleSheetUrl;
+        if (!url) return;
+        fetch(url + '?action=guests')
+            .then(r => r.json())
+            .then(list => {
+                if (!Array.isArray(list)) return;
+                REMOTE_GUESTS = list.filter(g => g && g.name);
+                // Báo cho các trang biết đã tải xong để cập nhật giao diện
+                document.dispatchEvent(new CustomEvent('remote-guests-loaded'));
+            })
+            .catch(() => { /* offline / chưa cấu hình — dùng guests.js + localStorage */ });
+    } catch (e) { /* bỏ qua */ }
+}
+loadRemoteGuests();
 
 // Tìm khách theo slug (trong GUESTS + localStorage)
 function findGuestBySlug(slug) {

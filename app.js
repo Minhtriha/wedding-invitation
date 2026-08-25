@@ -691,7 +691,7 @@ function sendWishToSheet(name, content, timeStr) {
             method: 'POST',
             mode: 'no-cors', // Apps Script không trả CORS header — bỏ qua kiểm tra response
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ name: name, content: content, time: timeStr })
+            body: JSON.stringify({ action: 'wish', name: name, content: content, time: timeStr })
         }).catch(() => { /* offline — lời chúc vẫn còn trong localStorage */ });
     } catch (e) { /* Không bao giờ làm gián đoạn trải nghiệm khách */ }
 }
@@ -752,6 +752,12 @@ function initAnalytics() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Khi danh sách khách từ Google Sheet tải xong -> cập nhật lại tên/bên/QR
+    document.addEventListener('remote-guests-loaded', () => {
+        applySideData();
+        initGuestPersonalization();
+    });
+
     initToast();
     applySideData();          // xác định bên (nhà trai/gái) trước để đếm ngược đúng ngày
     initWeddingData();

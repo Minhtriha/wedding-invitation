@@ -159,31 +159,79 @@ Website có sẵn hệ thống ghi nhận thống kê qua **Google Analytics 4**
 >
 > ⚠️ Nếu `gaMeasurementId` để trống, toàn bộ tính năng thống kê tự tắt — website vẫn chạy bình thường, không gây lỗi.
 
-## 📝 Xem lời chúc tập trung (Google Sheet)
+## 📝 Xem lời chúc + Quản lý khách qua Google Sheet
 
-Mặc định lời chúc trong Sổ Lưu Bút chỉ lưu trên máy của từng khách. Để nhận
-**tất cả lời chúc về một Google Sheet** của bạn, làm theo các bước sau (một lần duy nhất):
+Một Apps Script duy nhất lo cả 2 việc: **nhận lời chúc** và **lưu danh sách khách
+thêm từ trang quản lý** (dùng được ngay trên điện thoại, không cần máy tính).
 
-1. Tạo 1 Google Sheet mới tại [sheets.new](https://sheets.new), đặt tên VD: "Lời chúc cưới"
-2. Vào menu **Extensions → Apps Script**, xóa code mẫu và dán:
+### Bước 1: Tạo Google Sheet tại [sheets.new](https://sheets.new)
+
+### Bước 2: Extensions → Apps Script → xóa code mẫu, dán toàn bộ:
 
 ```javascript
+// ===== LỜI CHÚC =====
 function doPost(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(["Thời gian", "Tên khách", "Lời chúc"]);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const d = JSON.parse(e.postData.contents);
+
+  if (d.action === 'wish') {
+    const sh = ss.getSheetByName('LoiChuc') || ss.insertSheet('LoiChuc');
+    if (sh.getLastRow() === 0) sh.appendRow(['Thời gian', 'Tên khách', 'Lời chúc']);
+    sh.appendRow([d.time, d.name, d.content]);
+
+  } else if (d.action === 'addGuest' || d.action === 'setGuest') {
+    const sh = getGuestSheet(ss);
+    const data = sh.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === d.name) { // đã có -> cập nhật
+        if (d.side !== undefined) sh.getRange(i + 1, 2).setValue(d.side);
+        if (d.showBankQr !== undefined) sh.getRange(i + 1, 3).setValue(d.showBankQr ? '' : 'ẨN');
+        return ContentService.createTextOutput('OK');
+      }
+    }
+    sh.appendRow([d.name, d.side || '', d.showBankQr === false ? 'ẨN' : '']);
+
+  } else if (d.action === 'deleteGuest') {
+    const sh = getGuestSheet(ss);
+    const data = sh.getDataRange().getValues();
+    for (let i = data.length - 1; i >= 1; i--) {
+      if (data[i][0] === d.name) sh.deleteRow(i + 1);
+    }
   }
-  const data = JSON.parse(e.postData.contents);
-  sheet.appendRow([data.time, data.name, data.content]);
-  return ContentService.createTextOutput("OK");
+  return ContentService.createTextOutput('OK');
+}
+
+function getGuestSheet(ss) {
+  const sh = ss.getSheetByName('KhachMoi') || ss.insertSheet('KhachMoi');
+  if (sh.getLastRow() === 0) sh.appendRow(['Tên', 'Bên', 'Ghi chú QR']);
+  return sh;
+}
+
+// ===== DANH SÁCH KHÁCH cho thiệp + trang quản lý đọc =====
+function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getSheetByName('KhachMoi');
+  if (!sh || e.parameter.action !== 'guests') {
+    return ContentService.createTextOutput('[]').setMimeType(ContentService.MimeType.JSON);
+  }
+  const out = [];
+  const hideQr = [];
+  const data = sh.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    out.push({
+      name: String(data[i][0]),
+      side: String(data[i][1] || '').toLowerCase() === 'bride' ? 'bride' : 'groom',
+      showBankQr: String(data[i][2]).indexOf('ẨN') === -1
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify(out))
+         .setMimeType(ContentService.MimeType.JSON);
 }
 ```
 
-3. Bấm **Deploy → New deployment → chọn loại "Web app"**:
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-4. Bấm Deploy → copy **Web app URL** (dạng `https://script.google.com/macros/s/AKfy.../exec`)
-5. Dán URL đó vào `config.js`:
+### Bước 3: Deploy → New deployment → Web app
+- Execute as: **Me** — Who has access: **Anyone**
+- Copy **Web app URL** và dán vào `config.js`:
 
 ```js
 guestbook: {
@@ -191,9 +239,15 @@ guestbook: {
 }
 ```
 
-6. Commit + push → từ đó mỗi lời chúc khách gửi sẽ tự động thành 1 dòng trong Sheet.
+### Cách hoạt động sau khi cấu hình
+| Thao tác | Kết quả |
+|---|---|
+| Thêm khách trên trang quản lý (kể cả điện thoại) | Khách lưu vào Sheet "KhachMoi" → thiệp mọi thiết bị hiển thị đúng tên |
+| Đổi bên / ẩn QR của khách | Cập nhật lên Sheet |
+| Xóa khách | Xóa khỏi Sheet |
+| Khách gửi lời chúc | Lưu vào Sheet "LoiChuc" |
 
-> 💡 Lưu ý: lần deploy đầu Apps Script có thể hỏi quyền truy cập Google — bấm Allow nhé.
+> 💡 File `guests.js` vẫn là danh sách gốc dự phòng khi mạng lỗi/không tải được Sheet.
 
 ## 📝 Ghi chú
 
