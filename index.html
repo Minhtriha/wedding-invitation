@@ -589,6 +589,17 @@
 
         // Khởi tạo
         renderGuests();
+
+        // Backfill: cấp mã ngắn cho MỌI khách cũ (chưa có mã ngắn) khi mở trang quản lý.
+        // ensureGuestShortCode lưu vào localStorage + đồng bộ lên Sheet → link rút gọn ngay.
+        function backfillShortCodes() {
+            if (typeof ensureGuestShortCode !== 'function') return;
+            const guests = getGuests();
+            guests.forEach(g => { try { ensureGuestShortCode(g, true); } catch (e) {} });
+        }
+        // Chạy sau khi mà remote guests tải xong (đảm bảo đủ danh sách)
+        backfillShortCodes();
+        document.addEventListener('remote-guests-loaded', backfillShortCodes);
     </script>
 </body>
 </html>

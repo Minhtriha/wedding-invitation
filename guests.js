@@ -74,6 +74,65 @@ function makeShortCode(existingGuests) {
     return code;
 }
 
+// ---- MÃ NGẮN ỔN ĐỊNH CHO MỌI KHÁCH (backfill khách cũ) ----
+// Nếu khách chưa có mã ngắn (slug dài do tự sinh), cấp mã 6 ký tự và lưu lại
+// vào localStorage + Google Sheet để mọi thiết bị dùng chung, link được rút gọn.
+const SHORT_CODE_KEY = 'weddingShortCodes';
+function getShortCodeMap() {
+    try {
+        return JSON.parse(localStorage.getItem(SHORT_CODE_KEY) || '{}') || {};
+    } catch (e) {
+        return {};
+    }
+}
+function hasShortSlug(guest) {
+    // Ưu tiên slug thủ công (guest.slug) — đã được soạn/ngắn (VD "anh-phat") → giữ nguyên.
+    // Chỉ coi cần cấp mã ngắn khi KHÔNG có guest.slug thủ công (tức slug chỉ là slugify(name), dài).
+    if (guest && guest.slug && String(guest.slug).trim()) return true;
+    const s = getGuestSlug(guest); // = slugify(name) khi không có guest.slug
+    return Boolean(s) && s.length <= 7;
+}
+// Đảm bảo khách có mã ngắn ổn định (tạo mới nếu chưa có) và trả về nó.
+// Có guest.slug thủ công (ngắn) → dùng luôn. Ngược lại cấp mã 6 ký tự, lưu localStorage
+// + Sheet để một thiết bị khác lookup đúng tên. (Khách không có Sheet thì kèm &n=.)
+function ensureGuestShortCode(guest, usable) {
+    if (!guest) return '';
+    const s = getGuestSlug(guest);
+    if (hasShortSlug(guest)) return s;
+    const nameKey = (guest.name || '').trim().toLowerCase();
+    const map = getShortCodeMap();
+    if (map[nameKey]) return map[nameKey];
+    // tạo mã mới tránh trùng với mã đang dùng
+    if (usable) {
+        const base = getGuests ? getGuests() : [];
+        let code = makeShortCode(base);
+        let guard = 0;
+        while (Object.values(map).includes(code) && guard++ < 5) code = makeShortCode(base);
+        map[nameKey] = code;
+        try {
+            localStorage.setItem(SHORT_CODE_KEY, JSON.stringify(map));
+            // Đồng bộ mã ngắn lên Sheet để thiết bị khác lookup đúng tên
+            setSheetGuestSlug(guest, code);
+        } catch (e) {}
+        return code;
+    }
+    return s;
+}
+
+// Báo apps script cập nhật mã ngắn cho khách (addGuest/setGuest với slug)
+function setSheetGuestSlug(guest, code) {
+    try {
+        const url = (typeof WEDDING_CONFIG !== 'undefined') &&
+                    WEDDING_CONFIG.guestbook && WEDDING_CONFIG.guestbook.googleSheetUrl;
+        if (!url) return;
+        fetch(url, {
+            method: 'POST', mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'addGuest', name: guest.name, slug: code })
+        }).catch(() => {});
+    } catch (e) {}
+}
+
 // Lấy slug cho một khách (dùng slug có sẵn, nếu không có thì tự tạo)
 function getGuestSlug(guest) {
     return (guest.slug && guest.slug.trim()) ? guest.slug.trim() : slugify(guest.name);
@@ -228,8 +287,9 @@ function findGuestBySlug(slug) {
 function buildGuestLink(guest) {
     const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
     // Link rút gọn: to=<slug>.b.x  (.b = nhà gái, .x = ẩn QR).
-    // Khách thêm từ web quản lý có mã 6 ký tự ngắn (makeShortCode) → link rất gọn.
-    let url = base + 'wedding.html?to=' + getGuestSlug(guest);
+    // getGuestSlug ưu tiên slug ngắn có sẵn; khách thiếu mã ngắn → ensureGuestShortCode
+    // cấp mã 6 ký tự (backfill khách cũ) và lưu vào localStorage + Sheet → link gọn.
+    let url = base + 'wedding.html?to=' + ensureGuestShortCode(guest, true);
     const side = typeof getGuestSide === 'function' ? getGuestSide(guest) : null;
     const showQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guest) : true;
     if (side === 'bride') url += '.b';
