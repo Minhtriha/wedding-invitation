@@ -548,6 +548,8 @@ function initRsvpModal() {
             if (typeof trackEvent === 'function') {
                 trackEvent('rsvp_submit', { rsvp_name: name, rsvp_count: count });
             }
+            // Gửi xác nhận tham dự về Google Sheet (nếu đã cấu hình googleSheetUrl)
+            sendRsvpToSheet(name, count, note, new Date().toLocaleString('vi-VN'));
             closeRsvpModal();
             showToast('💌 Cảm ơn bạn đã xác nhận tham dự!');
         });
@@ -696,6 +698,23 @@ function sendWishToSheet(name, content, timeStr) {
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'wish', name: name, content: content, time: timeStr })
         }).catch(() => { /* offline — lời chúc vẫn còn trong localStorage */ });
+    } catch (e) { /* Không bao giờ làm gián đoạn trải nghiệm khách */ }
+}
+
+// ============================================================
+// GỬI XÁC NHẬN THAM DỰ (RSVP) VỀ GOOGLE SHEET
+// Cùng URL googleSheetUrl với lời chúc — Apps Script tách theo action.
+// ============================================================
+function sendRsvpToSheet(name, count, note, timeStr) {
+    try {
+        const url = cfg.guestbook && cfg.guestbook.googleSheetUrl;
+        if (!url) return; // Chưa cấu hình — chỉ lưu localStorage
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors', // Apps Script không trả CORS header — bỏ qua kiểm tra response
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'rsvp', name: name, count: count, note: note, time: timeStr })
+        }).catch(() => { /* offline — RSVP vẫn còn trong localStorage */ });
     } catch (e) { /* Không bao giờ làm gián đoạn trải nghiệm khách */ }
 }
 

@@ -179,6 +179,11 @@ function doPost(e) {
     if (sh.getLastRow() === 0) sh.appendRow(['Thời gian', 'Tên khách', 'Lời chúc']);
     sh.appendRow([d.time, d.name, d.content]);
 
+  } else if (d.action === 'rsvp') {
+    const sh = ss.getSheetByName('XacNhan') || ss.insertSheet('XacNhan');
+    if (sh.getLastRow() === 0) sh.appendRow(['Thời gian', 'Tên khách', 'Số người', 'Ghi chú']);
+    sh.appendRow([d.time, d.name, d.count, d.note]);
+
   } else if (d.action === 'addGuest' || d.action === 'setGuest') {
     const sh = getGuestSheet(ss);
     const data = sh.getDataRange().getValues();
