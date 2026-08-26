@@ -244,12 +244,19 @@ function loadRemoteGuests() {
     try {
         const url = (typeof WEDDING_CONFIG !== 'undefined') &&
                     WEDDING_CONFIG.guestbook && WEDDING_CONFIG.guestbook.googleSheetUrl;
+        // Nạp cache đã lưu lần trước NGAY (trước khi fetch) để tên khách xuất hiện tức thì
+        // (nếu đã từng mở), tránh flash shortcode ở lần xem sau.
+        try {
+            const cached = JSON.parse(localStorage.getItem('weddingRemoteCache') || 'null');
+            if (cached && Array.isArray(cached) && cached.length) REMOTE_GUESTS = cached;
+        } catch (e) { /* bỏ qua */ }
         if (!url) return;
         fetch(url + '?action=guests')
             .then(r => r.json())
             .then(list => {
                 if (!Array.isArray(list)) return;
                 REMOTE_GUESTS = list.filter(g => g && g.name);
+                try { localStorage.setItem('weddingRemoteCache', JSON.stringify(REMOTE_GUESTS)); } catch (e) {}
                 // Báo cho các trang biết đã tải xong để cập nhật giao diện
                 document.dispatchEvent(new CustomEvent('remote-guests-loaded'));
             })
@@ -279,12 +286,9 @@ function buildGuestLink(guest) {
     const showQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guest) : true;
     if (side === 'bride') url += '.b';
     if (!showQr) url += '.x';
-    // Chỉ nhúng tên (&n=) khi CHƯA cấu hình Google Sheet — nguồn dữ liệu duy nhất
-    // là máy quản lý nên cần mang tên theo link để thiết bị khác hiển thị đúng.
-    // Khi đã có Sheet, khách nằm trên Sheet → thiệp tải về và hiện tên, không cần &n.
-    const hasSheet = (typeof WEDDING_CONFIG !== 'undefined') &&
-                     WEDDING_CONFIG.guestbook && WEDDING_CONFIG.guestbook.googleSheetUrl;
-    if (!hasSheet && guest.name) url += '&n=' + encodeURIComponent(guest.name);
+    // Luôn nhúng tên (&n=Tên) vào link để tên khách hiển thị NGAY trên mọi thiết bị,
+    // không phụ thuộc tốc độ tải Google Sheet → không bị flash shortcode ở vài giây đầu.
+    if (guest.name) url += '&n=' + encodeURIComponent(guest.name);
     return url;
 }
 
