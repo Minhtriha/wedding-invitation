@@ -336,7 +336,10 @@ function resolveGuestName() {
         const byName = GUESTS.find(g => g.name.toLowerCase() === slug);
         if (byName) return byName.name;
     }
-    return slug;
+    // Chưa tìm thấy khách: có thể đang chờ Google Sheet tải xong (REMOTE_GUESTS).
+    // Trả null để KHÔNG ghi shortcode/slug làm tên hiển thị (tránh nháy sai).
+    // Khi sự kiện remote-guests-loaded fire, applyGuestName() sẽ resolve lại và hiện tên thật.
+    return null;
 }
 
 function applyGuestName() {
