@@ -224,7 +224,15 @@ function buildGuestLink(guest) {
     // khách chỉ tồn tại trên máy quản lý vẫn hiển thị đúng ở thiết bị khác.
     const hasSheet = (typeof WEDDING_CONFIG !== 'undefined') &&
                      WEDDING_CONFIG.guestbook && WEDDING_CONFIG.guestbook.googleSheetUrl;
-    if (!hasSheet && guest.name) url += '&n=' + encodeURIComponent(guest.name);
+    // Nhúng tên (&n=) để thiết bị khác hiển thị đúng khi:
+    // (1) chưa cấu hình Google Sheet, HOẶC
+    // (2) khách CHỈ nằm trong Sheet/localStorage (không có sẵn trong guests.js)
+    //     → vì dữ liệu Sheet tải bất đồng bộ, nếu không nhúng tên thì thiết bị
+    //     khác có thể hiện nhầm slug cho đến khi tải xong (hoặc sai nếu offline).
+    // Khách có sẵn trong guests.js thì KHÔNG cần &n → link vẫn ngắn tối thiểu.
+    const inBaseGuests = (typeof GUESTS !== 'undefined' && Array.isArray(GUESTS))
+        ? GUESTS.some(g => getGuestSlug(g) === getGuestSlug(guest)) : false;
+    if (guest.name && (!hasSheet || !inBaseGuests)) url += '&n=' + encodeURIComponent(guest.name);
     return url;
 }
 
