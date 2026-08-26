@@ -15,24 +15,9 @@
 //   Link sẽ là: wedding.html?to=anh-phat
 // ============================================================
 
-const GUESTS = [
-    { name: "Gia đình anh Phát", slug: "anh-phat" },
-    { name: "Anh chị Tuấn Anh", slug: "tuan-anh" },
-    { name: "Cô Mai và bạn", slug: "co-mai" },
-    { name: "Chú Hùng", slug: "chu-hung" },
-    { name: "Bác Bảy", slug: "bac-bay" },
-    { name: "Gia đình chị Hà", slug: "chi-ha" },
-    { name: "Anh Đức", slug: "anh-duc" },
-    { name: "Chị Thảo", slug: "chi-thao" },
-    { name: "Cô Lan", slug: "co-lan" },
-    { name: "Gia đình chú Tư", slug: "chu-tu" },
-    { name: "Anh Khoa", slug: "anh-khoa" },
-    { name: "Chị Ngọc", slug: "chi-ngoc" },
-    { name: "Bạn Minh", slug: "ban-minh" },
-    { name: "Bạn Huyền", slug: "ban-huyen" },
-    { name: "Gia đình Hiếu, Thư", slug: "gia-dinh-hieu-thu" },
-    { name: "Đồng nghiệp phòng Kinh doanh", slug: "dong-nghiep" }
-];
+// Danh sách khách mời — hiện đang TRỐNG (đã xóa toàn bộ khách theo yêu cầu).
+// Thêm khách mới ở đây (hoặc dễ hơn: dùng trang quản lý index.html → Google Sheet).
+const GUESTS = [];
 
 // ============================================================
 // KHÔNG CẦN SỬA PHẦN DƯỚI ĐÂY
