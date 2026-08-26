@@ -317,24 +317,29 @@ function resolveGuestName() {
     const n = new URLSearchParams(window.location.search).get('n');
     if (n && n.trim()) return decodeURIComponent(n).trim();
 
-    const raw = new URLSearchParams(window.location.search).get('to') || '';
-    if (!raw) return null;
-    const decoded = decodeURIComponent(raw).trim();
+    // Ưu tiên 2: URL_SLUG đã được tách bỏ token (.b / .x) trong guests.js.
+    // Tránh dùng raw ?to= vì nó còn chứa ".b.x" làm findGuestBySlug trượt/fallback sai.
+    let slug = '';
+    if (typeof URL_SLUG !== 'undefined' && URL_SLUG) {
+        slug = URL_SLUG;
+    } else {
+        const to = new URLSearchParams(window.location.search).get('to');
+        if (!to) return null;
+        slug = decodeURIComponent(to).trim().split('.')[0].toLowerCase();
+    }
+    if (!slug) return null;
     if (typeof findGuestBySlug === 'function') {
-        const bySlug = findGuestBySlug(decoded);
+        const bySlug = findGuestBySlug(slug);
         if (bySlug) return bySlug.name;
     }
     if (typeof GUESTS !== 'undefined' && Array.isArray(GUESTS)) {
-        const byName = GUESTS.find(g => g.name.toLowerCase() === decoded.toLowerCase());
+        const byName = GUESTS.find(g => g.name.toLowerCase() === slug);
         if (byName) return byName.name;
     }
-    return decoded;
+    return slug;
 }
 
-function initGuestPersonalization() {
-    // Xác định bên (nhà trai/gái) + dữ liệu riêng của khách trước tiên
-    applySideData();
-
+function applyGuestName() {
     const currentGuest = resolveGuestName();
     const envelopeGuestNameEl = document.getElementById('envelopeGuestName');
     const invitationGuestTargetEl = document.getElementById('invitationGuestTarget');
@@ -346,6 +351,19 @@ function initGuestPersonalization() {
         if (rsvpGuestNameInput) rsvpGuestNameInput.value = currentGuest;
         if (guestWishNameInput) guestWishNameInput.value = currentGuest;
     }
+}
+
+function initGuestPersonalization() {
+    // Xác định bên (nhà trai/gái) + dữ liệu riêng của khách trước tiên
+    applySideData();
+
+    applyGuestName();
+
+    // Khi Google Sheet tải xong (REMOTE_GUESTS sẵn sàng), re-render tên khách.
+    // Tránh trường hợp khách chỉ nằm trên Sheet mà resolve lúc đầu chưa kịp tải.
+    document.addEventListener('remote-guests-loaded', function () {
+        applyGuestName();
+    });
 }
 
 function initEnvelopeAndMusic() {
