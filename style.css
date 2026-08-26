@@ -271,10 +271,15 @@ body {
 .envelope-guest-name {
     /* Font hệ thống an toàn — hiển thị đúng tiếng Việt trên mọi thiết bị */
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-size: clamp(0.95rem, 2.8vw, 1.15rem);
     font-weight: 700;
+    line-height: 1.4;
     color: var(--ink-brown);
     margin-top: 2px;
+    /* Chống tràn chữ với tên dài */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
 }
 
 /* Wrapper của nút — đẩy cụm nút xuống gần đáy thẻ */
@@ -521,10 +526,15 @@ body {
 .guest-welcome-target {
     /* Font hệ thống an toàn — hiển thị đúng tiếng Việt trên mọi thiết bị */
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    font-size: clamp(1.15rem, 3.5vw, 1.45rem);
+    font-size: clamp(1rem, 3vw, 1.3rem);
     font-weight: 700;
+    line-height: 1.4;
     color: var(--red-retro);
     margin-top: 2px;
+    /* Chống tràn chữ với tên dài */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
 }
 
 /* ============================================================
