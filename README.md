@@ -235,7 +235,7 @@ function doGet(e) {
 
 ```js
 guestbook: {
-    googleSheetUrl: "https://script.google.com/macros/s/XXXX/exec"
+    googleSheetUrl: "https://docs.google.com/spreadsheets/d/1iGnryf9egB6xMExnXlL5AIe3k-Wa-gtfeykncdyaejM/edit?usp=sharing"
 }
 ```
 

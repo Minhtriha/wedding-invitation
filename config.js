@@ -146,7 +146,7 @@ const WEDDING_CONFIG = {
     // toàn bộ lời chúc của khách về Google Sheet (để trống = chỉ lưu máy khách).
     // ---------------------------------------------------------------------
     guestbook: {
-        googleSheetUrl: ""
+        googleSheetUrl: "https://script.google.com/macros/s/AKfycbywtZ8HCUijM2UGcBcd8taY7PnBfrFMWr4UzMFh49goZQ7AAfKTsLbO3zhKdqxL3F_AyQ/exec"
     },
 
     // ---------------------------------------------------------------------
