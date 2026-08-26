@@ -179,11 +179,6 @@ function doPost(e) {
     if (sh.getLastRow() === 0) sh.appendRow(['Thời gian', 'Tên khách', 'Lời chúc']);
     sh.appendRow([d.time, d.name, d.content]);
 
-  } else if (d.action === 'rsvp') {
-    const sh = ss.getSheetByName('XacNhan') || ss.insertSheet('XacNhan');
-    if (sh.getLastRow() === 0) sh.appendRow(['Thời gian', 'Tên khách', 'Số người', 'Ghi chú']);
-    sh.appendRow([d.time, d.name, d.count, d.note]);
-
   } else if (d.action === 'addGuest' || d.action === 'setGuest') {
     const sh = getGuestSheet(ss);
     const data = sh.getDataRange().getValues();
@@ -191,10 +186,11 @@ function doPost(e) {
       if (data[i][0] === d.name) { // đã có -> cập nhật
         if (d.side !== undefined) sh.getRange(i + 1, 2).setValue(d.side);
         if (d.showBankQr !== undefined) sh.getRange(i + 1, 3).setValue(d.showBankQr ? '' : 'ẨN');
+        if (d.slug !== undefined) sh.getRange(i + 1, 4).setValue(d.slug); // mã ngắn
         return ContentService.createTextOutput('OK');
       }
     }
-    sh.appendRow([d.name, d.side || '', d.showBankQr === false ? 'ẨN' : '']);
+    sh.appendRow([d.name, d.side || '', d.showBankQr === false ? 'ẨN' : '', d.slug || '']);
 
   } else if (d.action === 'deleteGuest') {
     const sh = getGuestSheet(ss);
@@ -208,7 +204,7 @@ function doPost(e) {
 
 function getGuestSheet(ss) {
   const sh = ss.getSheetByName('KhachMoi') || ss.insertSheet('KhachMoi');
-  if (sh.getLastRow() === 0) sh.appendRow(['Tên', 'Bên', 'Ghi chú QR']);
+  if (sh.getLastRow() === 0) sh.appendRow(['Tên', 'Bên', 'Ghi chú QR', 'Slug']);
   return sh;
 }
 
@@ -220,13 +216,14 @@ function doGet(e) {
     return ContentService.createTextOutput('[]').setMimeType(ContentService.MimeType.JSON);
   }
   const out = [];
-  const hideQr = [];
   const data = sh.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     out.push({
       name: String(data[i][0]),
       side: String(data[i][1] || '').toLowerCase() === 'bride' ? 'bride' : 'groom',
-      showBankQr: String(data[i][2]).indexOf('ẨN') === -1
+      showBankQr: String(data[i][2]).indexOf('ẨN') === -1,
+      // Cột 4 là mã ngắn (slug) — giúp link ?to=<mã ngắn> hiển thị đúng tên ở mọi thiết bị
+      slug: String(data[i][3] || '')
     });
   }
   return ContentService.createTextOutput(JSON.stringify(out))
@@ -240,7 +237,7 @@ function doGet(e) {
 
 ```js
 guestbook: {
-    googleSheetUrl: "https://docs.google.com/spreadsheets/d/1iGnryf9egB6xMExnXlL5AIe3k-Wa-gtfeykncdyaejM/edit?usp=sharing"
+    googleSheetUrl: "https://script.google.com/macros/s/AKfycbwkHsHd-IbnYpr4fvStAnsFCo9PGf_j1as5daFAxB5ckldTlJSIKLlNyJ_0qAFD3INy/exec"
 }
 ```
 

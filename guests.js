@@ -61,6 +61,19 @@ function slugify(name) {
     return str || 'guest';
 }
 
+// Sinh mã ngắn (shortcode) gồm 6 ký tự dễ đọc, không gây trùng với khách khác.
+// Dùng cho khách thêm từ web quản lý để link thiệp ngắn: ?to=<mangu>.b.x
+function makeShortCode(existingGuests) {
+    const chars = 'abcdefghijkmnpqrstuvwxyz23456789'; // bỏ chữ dễ nhầm: l,0,o,1
+    const used = new Set((existingGuests || []).map(getGuestSlug));
+    let code;
+    do {
+        code = '';
+        for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    } while (used.has(code));
+    return code;
+}
+
 // Lấy slug cho một khách (dùng slug có sẵn, nếu không có thì tự tạo)
 function getGuestSlug(guest) {
     return (guest.slug && guest.slug.trim()) ? guest.slug.trim() : slugify(guest.name);
@@ -214,25 +227,19 @@ function findGuestBySlug(slug) {
 // hiển thị đúng ngay cả khi khách chỉ tồn tại trong localStorage máy quản lý.
 function buildGuestLink(guest) {
     const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-    // Link rút gọn: to=<slug>.b.x  (.b = nhà gái, .x = ẩn QR)
+    // Link rút gọn: to=<slug>.b.x  (.b = nhà gái, .x = ẩn QR).
+    // Khách thêm từ web quản lý có mã 6 ký tự ngắn (makeShortCode) → link rất gọn.
     let url = base + 'wedding.html?to=' + getGuestSlug(guest);
     const side = typeof getGuestSide === 'function' ? getGuestSide(guest) : null;
     const showQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guest) : true;
     if (side === 'bride') url += '.b';
     if (!showQr) url += '.x';
-    // Nếu CHƯA cấu hình Google Sheet: nhúng thêm tên đầy đủ (&n=) để
-    // khách chỉ tồn tại trên máy quản lý vẫn hiển thị đúng ở thiết bị khác.
+    // Chỉ nhúng tên (&n=) khi CHƯA cấu hình Google Sheet — nguồn dữ liệu duy nhất
+    // là máy quản lý nên cần mang tên theo link để thiết bị khác hiển thị đúng.
+    // Khi đã có Sheet, khách nằm trên Sheet → thiệp tải về và hiện tên, không cần &n.
     const hasSheet = (typeof WEDDING_CONFIG !== 'undefined') &&
                      WEDDING_CONFIG.guestbook && WEDDING_CONFIG.guestbook.googleSheetUrl;
-    // Nhúng tên (&n=) để thiết bị khác hiển thị đúng khi:
-    // (1) chưa cấu hình Google Sheet, HOẶC
-    // (2) khách CHỈ nằm trong Sheet/localStorage (không có sẵn trong guests.js)
-    //     → vì dữ liệu Sheet tải bất đồng bộ, nếu không nhúng tên thì thiết bị
-    //     khác có thể hiện nhầm slug cho đến khi tải xong (hoặc sai nếu offline).
-    // Khách có sẵn trong guests.js thì KHÔNG cần &n → link vẫn ngắn tối thiểu.
-    const inBaseGuests = (typeof GUESTS !== 'undefined' && Array.isArray(GUESTS))
-        ? GUESTS.some(g => getGuestSlug(g) === getGuestSlug(guest)) : false;
-    if (guest.name && (!hasSheet || !inBaseGuests)) url += '&n=' + encodeURIComponent(guest.name);
+    if (!hasSheet && guest.name) url += '&n=' + encodeURIComponent(guest.name);
     return url;
 }
 

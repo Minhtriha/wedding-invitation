@@ -555,11 +555,14 @@
             }
             const side = document.getElementById('newGuestSide').value;
             const showBankQr = !document.getElementById('newGuestHideQr').checked;
+            // Tạo mã ngắn 6 ký tự cho link thiệp → ?to=<mangu>.b.x  (link gọn)
+            const shortCode = (typeof makeShortCode === 'function')
+                ? makeShortCode(getGuests()) : slugify(name);
             const custom = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
-            custom.push({ name, greeting: '', side, showBankQr });
+            custom.push({ name, slug: shortCode, greeting: '', side, showBankQr });
             localStorage.setItem('weddingGuests', JSON.stringify(custom));
-            // Đồng bộ khách mới lên Google Sheet để mọi thiết bị nhận được
-            postToSheet({ action: 'addGuest', name: name, side: side, showBankQr: showBankQr });
+            // Đồng bộ khách mới (kèm mã ngắn) lên Google Sheet để mọi thiết bị nhận được
+            postToSheet({ action: 'addGuest', name: name, slug: shortCode, side: side, showBankQr: showBankQr });
             newGuestNameEl.value = '';
             showToast('Đã thêm: ' + name);
             renderGuests();
