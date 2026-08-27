@@ -208,9 +208,26 @@ function getGuestSheet(ss) {
   return sh;
 }
 
-// ===== DANH SÁCH KHÁCH cho thiệp + trang quản lý đọc =====
+// ===== DANH SÁCH KHÁCH + LỜI CHÚC cho thiệp & trang quản lý đọc =====
 function doGet(e) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Trả về toàn bộ lời chúc => để thiệp hiển thị đầy đủ lời chúc của MỌI khách
+  if (e.parameter.action === 'wishes') {
+    const sh = ss.getSheetByName('LoiChuc');
+    if (!sh) return ContentService.createTextOutput('[]').setMimeType(ContentService.MimeType.JSON);
+    const rows = sh.getDataRange().getValues();
+    // Bỏ dòng tiêu đề nếu có (cột đầu = "Thời gian")
+    const start = (rows[0] && String(rows[0][0]).trim() === 'Thời gian') ? 1 : 0;
+    const list = [];
+    for (let i = start; i < rows.length; i++) {
+      if (!rows[i][1]) continue; // bỏ dòng trống tên
+      list.push({ time: String(rows[i][0] || ''), name: String(rows[i][1] || ''), content: String(rows[i][2] || '') });
+    }
+    return ContentService.createTextOutput(JSON.stringify(list)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Danh sách khách (giữ nguyên cũ)
   const sh = ss.getSheetByName('KhachMoi');
   if (!sh || e.parameter.action !== 'guests') {
     return ContentService.createTextOutput('[]').setMimeType(ContentService.MimeType.JSON);

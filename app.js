@@ -662,9 +662,24 @@ function initGuestbook() {
 
     function renderWishes() {
         if (!wishesListEl) return;
-        const saved = JSON.parse(localStorage.getItem('weddingWishes') || 'null') || defaultWishes;
+        // Lời chúc từ Sheet (cache localStorage) — ưu tiên hiển thị đầy đủ toàn bộ khách gửi
+        const remote = JSON.parse(localStorage.getItem('weddingRemoteWishes') || 'null') || [];
+        // Lời chúc do chính thiết bị này gửi trong session (ưu tiên hiện trên đầu)
+        const local = JSON.parse(localStorage.getItem('weddingWishes') || 'null') || [];
+
+        let data = [];
+        if (remote.length) {
+            data = [...remote];
+        } else {
+            // Chưa tải được lời chúc từ Sheet (offline / chưa cấu hình) → dùng lời chúc mẫu
+            data = [...defaultWishes];
+        }
+        // Tránh trùng: nếu local đã trùng với remote thì không thêm nữa
+        const seen = new Set(data.map(x => (x.name || '') + '|' + (x.content || '')));
+        data = [...local.filter(x => !seen.has((x.name || '') + '|' + (x.content || ''))), ...data];
+
         wishesListEl.innerHTML = '';
-        saved.forEach(item => {
+        data.forEach(item => {
             const div = document.createElement('div');
             div.className = 'wish-card';
             div.innerHTML = `
@@ -676,6 +691,23 @@ function initGuestbook() {
             `;
             wishesListEl.appendChild(div);
         });
+    }
+
+    // Tải toàn bộ lời chúc từ Google Sheet về (1 lần) rồi lưu cache localStorage
+    function loadRemoteWishes() {
+        try {
+            const url = cfg.guestbook && cfg.guestbook.googleSheetUrl;
+            if (!url) return; // Chưa cấu hình — giữ hành vi cũ (chỉ mẫu + localStorage)
+            fetch(url + '?action=wishes')
+                .then(r => r.json())
+                .then(list => {
+                    if (Array.isArray(list)) {
+                        localStorage.setItem('weddingRemoteWishes', JSON.stringify(list));
+                        renderWishes();
+                    }
+                })
+                .catch(() => { /* offline — vẫn dùng localStorage + mẫu */ });
+        } catch (e) { /* bỏ qua */ }
     }
 
     if (guestbookForm) {
@@ -701,6 +733,7 @@ function initGuestbook() {
         });
     }
 
+    loadRemoteWishes();
     renderWishes();
 }
 
