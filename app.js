@@ -647,11 +647,13 @@ function initGuestbook() {
     const guestbookForm = document.getElementById('guestbookForm');
     const wishesListEl = document.getElementById('wishesList');
 
-    const defaultWishes = [
-        { name: "Gia đình cô Lan", time: "10:58 19/08/2026", content: "Chúc hai cháu trăm năm hạnh phúc, sớm sinh quý tử!" },
-        { name: "Bạn thân của cô dâu", time: "10:58 18/08/2026", content: "Chúc mừng hai bạn về chung một nhà. Mong hai bạn luôn yêu thương nhau như ngày đầu!" },
-        { name: "Anh Minh", time: "10:58 17/08/2026", content: "Nhìn thiệp mà thấy ấm áp ghê. Chúc đám cưới thật trọn vẹn nhé!" },
-        { name: "Chị Hương", time: "10:58 16/08/2026", content: "Chúc cô dâu chú rể trăm năm hảo hợp, gia đình luôn đầm ấm." }
+        const defaultWishes = [
+        { name: "Gia đình cô Lan", time: "10:58 19/08/2026", content: "Chúc hai cháu trăm năm hạnh phúc bên nhau, sớm có thiên thần nhỏ đoán hơn!" },
+        { name: "Bạn thanh thiếu niên cô", time: "10:58 18/08/2026", content: "Chúc cô dâu tràn đầy nụ cười, chú rể vui tươi hạnh phúc. Đám cưới thật ý nghĩa và trọn vẹn nhé!" },
+        { name: "Anh Minh", time: "10:58 17/08/2026", content: "Nhìn thiệp mà thấy ấm áp ghê. Chúc anh và em cùng vượt qua mọi chặng đường, luôn dìu nhau đi bộ đến già!" },
+        { name: "Chị Hương", time: "10:58 16/08/2026", content: "Chúc cặp đôi trăm năm hằng hành, gia đình luôn tràn ngập tình yêu thương và tiếng cười. Thiêng liên tỏ tình nhé!" },
+        { name: "Bạn thân của chú rể", time: "09:12 15/08/2026", content: "Chúc em và anh tróng hợp về một nhà sớm, mãi mãi thật thời gian bên nhau. Tiệc tối thật vui không keo kểnh!" },
+        { name: "Cô giáp", time: "08:30 14/08/2026", content: "Chúc hôn lễ thật rực rỡ, nụ hôn của anh đẹp như ngày trăng. Chúc vợ chồng hạ bình an, mỗi ngày đều là ngày hạnh phúc!" }
     ];
 
     function escapeHtml(str) {
