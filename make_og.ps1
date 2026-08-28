@@ -20,6 +20,7 @@ $sfR.Alignment = 'center'; $sfR.LineAlignment = 'center'
 $tT1 = [char]0x54+[char]0x68+[char]0x69+[char]0x1EC7+[char]0x70+' '+[char]0x4D+[char]0x1EDD+[char]0x69+' '+[char]0x43+[char]0x1B0+[char]0x1EDB+[char]0x69
 $tBT = [char]0x42+[char]0x1EA3+[char]0x6F+' '+[char]0x54+[char]0x72+[char]0xE2+[char]0x6E
 $tMT = [char]0x4D+[char]0x69+[char]0x6E+[char]0x68+' '+[char]0x54+[char]0x72+[char]0xED
+$tHeart = '&'
 
 function DrawText($g,$t,$f,$c,$x,$y,$px,$py){
   $br = New-Object System.Drawing.SolidBrush($c)
@@ -41,7 +42,7 @@ function SaveJ($bmp,$name,$q){
   Write-Output ('OK '+$name)
 }
 
-# ---- MẪU 1 FINAL: bỏ thời gian, bo góc ảnh 30px, viền vàng mảnh, text căn giữa thoáng ----
+# ---- MẪU 1 FINAL: bỏ thời gian, bo góc ảnh 30px, dùng & phân tách, text căn giữa thoáng ----
 $b = New-Object System.Drawing.Bitmap($W,$H); $g = [System.Drawing.Graphics]::FromImage($b)
 $g.Clear($cream)
 $g.SmoothingMode = 'AntiAlias'; $g.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::AntiAliasGridFit
@@ -60,12 +61,18 @@ DrawCover $g $hero $imgX $imgY $imgW $imgH
 $g.ResetClip()
 
 $textX = 570; $textW = 560
+
+# "Thiệp Mời Cưới" nhỏ & gạch trang trí
 $g.DrawString($tT1, $fScript, (New-Object System.Drawing.SolidBrush($goldLine)), (New-Object System.Drawing.RectangleF($textX,90,$textW,55)), $sfR)
 $linePen = New-Object System.Drawing.Pen($goldLine); $linePen.Width = 1
 $g.DrawLine($linePen, 620, 175, 620+560-100, 175)
 
-DrawText $g $tBT $fSerifD $brown $textX 230 $textW 90
-DrawText $g $tMT $fSerifD $brown $textX 345 $textW 90
+# "Bảo Trân"
+DrawText $g $tBT $fSerifD $brown $textX 210 $textW 90
+# Dấu & màu vàng ở giữa
+DrawText $g $tHeart $fScript $goldLine $textX 300 $textW 50
+# "Minh Trí"
+DrawText $g $tMT $fSerifD $brown $textX 350 $textW 90
 
 SaveJ $b 'mau1-final.jpg' 95
 $hero.Dispose()
