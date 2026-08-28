@@ -647,13 +647,23 @@ function initGuestbook() {
     const guestbookForm = document.getElementById('guestbookForm');
     const wishesListEl = document.getElementById('wishesList');
 
-        const defaultWishes = [
-        { name: "Gia đình cô Lan", time: "10:58 19/08/2026", content: "Chúc hai cháu trăm năm hạnh phúc bên nhau, sớm có thiên thần nhỏ đoán hơn!" },
-        { name: "Bạn thanh thiếu niên cô", time: "10:58 18/08/2026", content: "Chúc cô dâu tràn đầy nụ cười, chú rể vui tươi hạnh phúc. Đám cưới thật ý nghĩa và trọn vẹn nhé!" },
-        { name: "Anh Minh", time: "10:58 17/08/2026", content: "Nhìn thiệp mà thấy ấm áp ghê. Chúc anh và em cùng vượt qua mọi chặng đường, luôn dìu nhau đi bộ đến già!" },
-        { name: "Chị Hương", time: "10:58 16/08/2026", content: "Chúc cặp đôi trăm năm hằng hành, gia đình luôn tràn ngập tình yêu thương và tiếng cười. Thiêng liên tỏ tình nhé!" },
-        { name: "Bạn thân của chú rể", time: "09:12 15/08/2026", content: "Chúc em và anh tróng hợp về một nhà sớm, mãi mãi thật thời gian bên nhau. Tiệc tối thật vui không keo kểnh!" },
-        { name: "Cô giáp", time: "08:30 14/08/2026", content: "Chúc hôn lễ thật rực rỡ, nụ hôn của anh đẹp như ngày trăng. Chúc vợ chồng hạ bình an, mỗi ngày đều là ngày hạnh phúc!" }
+            const WISHES_VERSION = 2; // bump khi thay đổi defaultWishes để xóa cache lời chúc cũ trên thiết bị
+    const defaultWishes = [
+        { name: "Vợ chồng bạn Minh Anh", time: "08:42 27/08/2026", content: "Chúc 2 vợ chồng luôn hạnh phúc. Mau có quý tử hoặc công chúa để chơi với Kitty nha." },
+        { name: "Vợ chồng bạn Phương", time: "08:44 27/08/2026", content: "Chúc Trí và Trân luôn nghĩ cho nhau và bên nhau tới kiếp sau❤️" },
+        { name: "Thầy Vinh +", time: "09:27 27/08/2026", content: "Chúc con gái hạnh phúc viên mãn,luôn xinh đẹp nhé" },
+        { name: "Chị Hà +", time: "09:34 27/08/2026", content: "Chúc em hạnh phúc nha❤️❤️" },
+        { name: "Gia đình anh Hiếu, chị Thư", time: "09:45 27/08/2026", content: "Chúc 2 vợ chồng tỷ năm HP ❤️" },
+        { name: "Anh Quất +", time: "09:58 27/08/2026", content: "Chúc con bé ngáo ngày nào đã tìm được bến đỗ. Chúc hai Vợ Chồng luôn thấu hiểu và yêu thương!" },
+        { name: "Vợ chồng anh Thông, chị Thuyền", time: "10:14 27/08/2026", content: "chúc chàng trai miệt vườn cô gái thị thành trăm năm hạnh phúc! chúc mừng 2 em về chung một nhà" },
+        { name: "Em Trung Cao +", time: "10:20 27/08/2026", content: "Chúc Anh Chị răng long đầu bạc, tình cảm luôn đậm đà như Laura Cafe hỉ🍻🎁" },
+        { name: "Vợ chồng anh Phúc, chị Linh", time: "10:56 27/08/2026", content: "Chúc bé trăm năm hạnh phúc 🥰 luôn yêu thương và trân trọng nha 🫶" },
+        { name: "Bạn Kim Tuyền iu +", time: "11:24 27/08/2026", content: "ỏoo dạ em đồng ý :))) em đồng ý đến dự ngày trọng đại của bạn iu của em ạ 🤣 Hehe hạnh phúc nhất trên đời cho tui nhó bà ❤️" },
+        { name: "Bạn My +", time: "11:47 27/08/2026", content: "Chúc bạn iu trăm năm hạnh phúc ❤️" },
+        { name: "Vợ chồng Vi", time: "12:29 27/08/2026", content: "Chúc mừng Trân và Trí sắp về chung một nhà.  Phải thật hạnh phúc nha" },
+        { name: "Bạn cùng bàn", time: "09:14 27/08/2026", content: "Chúc hai bạn trăm năm hạnh phúc, luôn yêu thương, thấu hiểu và đồng hành cùng nhau trên mọi chặng đường phía trước. Chúc gia đình nhỏ của hai bạn luôn ngập tràn tiếng cười và những điều tốt đẹp nhất nháaa" },
+        { name: "Bạn Đức Anh +", time: "22:37 27/08/2026", content: "Chúc mừng m nheee, chúc m vs anh ấy hạnh phúc 😆" },
+        { name: "Bạn Hoàng Bảo", time: "07:39 28/08/2026", content: "Chúc vợ chồng trăm năm hạnh phúc, bách niên giai lão!" }
     ];
 
     function escapeHtml(str) {
@@ -666,8 +676,19 @@ function initGuestbook() {
         if (!wishesListEl) return;
         // Lời chúc từ Sheet (cache localStorage) — ưu tiên hiển thị đầy đủ toàn bộ khách gửi
         const remote = JSON.parse(localStorage.getItem('weddingRemoteWishes') || 'null') || [];
-        // Lời chúc do chính thiết bị này gửi trong session (ưu tiên hiện trên đầu)
-        const local = JSON.parse(localStorage.getItem('weddingWishes') || 'null') || [];
+                // Lời chúc do chính thiết bị này gửi trong session (ưu tiên hiện trên đầu)
+        // — xóa cache cũ (có chứa lời chúc mẫu test) nếu version mỗi khác, tránh lỗi hiển thị lỗi thời.
+                const currentVersion = String(WISHES_VERSION);
+        const storedVersion = localStorage.getItem('weddingWishesVersion');
+        let local = JSON.parse(localStorage.getItem('weddingWishes') || 'null');
+        if (!Array.isArray(local) || storedVersion !== currentVersion) {
+            // Cache cũ / version mismatch -> xóa để tránh hiện lời chúc mẫu test cũ
+            local = [];
+        }
+        // Đồng bộ version để lần kế sau không xóa nhầm lời chúc thật mới gửi
+        if (storedVersion !== currentVersion) {
+            localStorage.setItem('weddingWishesVersion', currentVersion);
+        }
 
         let data = [];
         if (remote.length) {
@@ -720,7 +741,15 @@ function initGuestbook() {
             if (!name || !content) return;
             const now = new Date();
             const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth()+1).padStart(2, '0')}/${now.getFullYear()}`;
-            const saved = JSON.parse(localStorage.getItem('weddingWishes') || 'null') || [...defaultWishes];
+                        const saved = (function () {
+                const v = localStorage.getItem('weddingWishesVersion');
+                if (v !== String(WISHES_VERSION)) {
+                    localStorage.setItem('weddingWishesVersion', String(WISHES_VERSION));
+                    return [...defaultWishes];
+                }
+                const prev = JSON.parse(localStorage.getItem('weddingWishes') || 'null');
+                return Array.isArray(prev) ? prev : [...defaultWishes];
+            })();
             saved.unshift({ name, content, time: timeStr });
             localStorage.setItem('weddingWishes', JSON.stringify(saved));
             document.getElementById('guestWishContent').value = '';
