@@ -454,14 +454,14 @@ function initShare() {
         const shareData = {
             title: document.title,
             text: `💌 Trân trọng kính mời bạn đến dự lễ hôn lễ của ${brideShort} & ${groomShort} — 19.09.2026`,
-            url: window.location.href
+            url: (() => { const g = typeof findCurrentGuest === 'function' ? findCurrentGuest() : null; return (g && typeof buildGuestLink === 'function') ? buildGuestLink(g) : window.location.href; })()
         };
         if (navigator.share) {
             try {
                 await navigator.share(shareData);
             } catch (e) { /* Người dùng đóng hộp thoại chia sẻ */ }
         } else {
-            copyText(window.location.href, '🔗 Đã copy link thiệp — dán vào Zalo/Messenger để gửi!');
+            copyText(shareData.url, '🔗 Đã copy link thiệp — dán vào Zalo/Messenger để gửi!');
         }
     });
 }

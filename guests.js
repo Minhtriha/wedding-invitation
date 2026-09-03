@@ -288,7 +288,7 @@ function buildGuestLink(guest) {
     if (!showQr) url += '.x';
     // Luôn nhúng tên (&n=Tên) vào link để tên khách hiển thị NGAY trên mọi thiết bị,
     // không phụ thuộc tốc độ tải Google Sheet → không bị flash shortcode ở vài giây đầu.
-    if (guest.name) url += '&n=' + encodeURIComponent(guest.name);
+
     return url;
 }
 
