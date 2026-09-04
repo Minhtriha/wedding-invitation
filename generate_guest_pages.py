@@ -73,7 +73,7 @@ def render_page(domain, slug, name, tokens):
 <meta name="twitter:title" content="{esc(og_title)}">
 <meta name="twitter:description" content="{esc(og_desc)}">
 <meta name="twitter:image" content="{img_url}">
-<meta http-equiv="refresh" content="0; url={redir}">
+<!-- no meta refresh (redirect via JS only) so link-preview bots keep the static OG -->
 <script>location.replace("{redir}");</script>
 <style>
   body{{margin:0;font-family:Georgia,serif;background:#f7e6c4;color:#3e2b1f;height:100vh;display:flex;align-items:center;justify-content:center}}
