@@ -281,11 +281,9 @@ function buildGuestLink(guest) {
     // Link rút gọn: to=<slug>.b.x  (.b = nhà gái, .x = ẩn QR).
     // getGuestSlug ưu tiên slug ngắn có sẵn; khách thiếu mã ngắn → ensureGuestShortCode
     // cấp mã 6 ký tự (backfill khách cũ) và lưu vào localStorage + Sheet → link gọn.
-    let url = base + 'wedding.html?to=' + ensureGuestShortCode(guest, true);
-    const side = typeof getGuestSide === 'function' ? getGuestSide(guest) : null;
-    const showQr = typeof getGuestShowBankQr === 'function' ? getGuestShowBankQr(guest) : true;
-    if (side === 'bride') url += '.b';
-    if (!showQr) url += '.x';
+    // Per-guest static OG page (guest/<slug>.html) => Messenger caches a
+    // unique object per guest and shows the guest name. Redirects to wedding.html.
+    let url = base + 'guest/' + ensureGuestShortCode(guest, true) + '.html';
     // Luôn nhúng tên (&n=Tên) vào link để tên khách hiển thị NGAY trên mọi thiết bị,
     // không phụ thuộc tốc độ tải Google Sheet → không bị flash shortcode ở vài giây đầu.
 
