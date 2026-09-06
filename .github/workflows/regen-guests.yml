@@ -1,0 +1,38 @@
+name: Regen Guest OG Pages
+
+# Auto-regenerate the static guest/<slug>.html OG pages from the Google Sheet
+# so newly added guests don't 404 when shared on Messenger/Zalo.
+# Only touches the guest/ folder - it never modifies app/config code.
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Regenerate guest OG pages from Google Sheet
+        run: python generate_guest_pages.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add guest/
+          if git diff --cached --quiet; then
+            echo "No guest OG pages changed."
+          else
+            git commit -m "ci: regenerate guest OG pages from Sheet (auto)"
+            git push
+          fi
