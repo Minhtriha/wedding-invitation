@@ -1,4 +1,7 @@
 import json, os, sys, argparse, urllib.request, urllib.parse, html
+# Ensure stdout handles Vietnamese diacritics on Windows consoles (cp1252-safe)
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 # Vietnamese strings as unicode escapes to keep source pure-ASCII (encoding-proof)
 EMOJI       = "\U0001f48c"            # \U0001f48c
@@ -73,7 +76,8 @@ def render_page(domain, slug, name, tokens):
 <meta name="twitter:title" content="{esc(og_title)}">
 <meta name="twitter:description" content="{esc(og_desc)}">
 <meta name="twitter:image" content="{img_url}">
-<meta http-equiv="refresh" content="0; url={redir}">
+<!-- meta refresh intentionally removed: keeps per-guest og tags readable by
+     crawlers (Messenger/Facebook/Zalo). Human visitors still redirect via JS below. -->
 <script>location.replace("{redir}");</script>
 <style>
   body{{margin:0;font-family:Georgia,serif;background:#f7e6c4;color:#3e2b1f;height:100vh;display:flex;align-items:center;justify-content:center}}
